@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: SevenTeamProject
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/test #테이블 명 변경 하기
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 12345678
+
+  jpa:
+    hibernate:
+      ddl-auto: update         # 테이블 자동 생성/업데이트 (실무는 validate, none)
+    show-sql: true             # 실행되는 SQL 로그 보기
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: info
+
+jwt:
+  secret: nG9QhQWm4f8+YkqC2k0R2g6v7JpH9XlV3Wb1TzQ8sYc=
+  access-token-validity: 691200000
