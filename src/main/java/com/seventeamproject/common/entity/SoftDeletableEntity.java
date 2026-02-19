@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public class SoftDeletableEntity extends BaseEntity {
 
+    private Long deletedBy;
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
