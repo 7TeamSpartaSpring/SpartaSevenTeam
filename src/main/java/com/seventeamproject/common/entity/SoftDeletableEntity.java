@@ -14,11 +14,13 @@ public class SoftDeletableEntity extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public void delete() {
+    public void delete(Long id) {
+        this.deletedBy = id;
         this.deletedAt = LocalDateTime.now();
     }
 
     public void restore() {
+        this.deletedBy = null;
         this.deletedAt = null;
     }
 

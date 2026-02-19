@@ -5,13 +5,11 @@ import com.seventeamproject.example.many.dto.ManyRequest;
 import com.seventeamproject.example.many.dto.ManyResponse;
 import com.seventeamproject.example.many.entity.Many;
 import com.seventeamproject.example.many.repository.ManyRepository;
-import com.seventeamproject.example.one.repository.OneRepository;
+import com.seventeamproject.example.one.service.OneReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,14 +17,14 @@ import java.util.List;
 public class ManyService {
 
     private final ManyRepository manyRepository;
-    private final OneRepository oneRepository;
+    private final OneReader oneReader;
 
     @Transactional
     public ManyResponse save(Long id, ManyRequest request) {
         return new ManyResponse(manyRepository.save(new Many(
                 request.content(),
                 request.value(),
-                oneRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지"))
+                oneReader.getEntty(id)
         )));
     }
 
@@ -45,7 +43,7 @@ public class ManyService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        manyRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).delete();
+    public void delete(Long id, Long userId) {
+        manyRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).delete(userId);
     }
 }

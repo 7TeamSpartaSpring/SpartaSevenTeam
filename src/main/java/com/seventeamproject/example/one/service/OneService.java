@@ -1,7 +1,7 @@
 package com.seventeamproject.example.one.service;
 
 import com.seventeamproject.common.dto.PageResponse;
-import com.seventeamproject.example.many.repository.ManyRepository;
+import com.seventeamproject.example.many.service.ManyService;
 import com.seventeamproject.example.one.dto.OneRequest;
 import com.seventeamproject.example.one.dto.OneResponse;
 import com.seventeamproject.example.one.dto.OnesResponse;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OneService {
 
     private final OneRepository oneRepository;
-    private final ManyRepository manyRepository;
+    private final ManyService manyService;
 
     @Transactional
     public OneResponse save(OneRequest request) {
@@ -32,7 +32,7 @@ public class OneService {
     public OneResponse getOne(Pageable pageable, Long id) {
         return new OneResponse(
                 oneRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")),
-                new PageResponse<>(manyRepository.search(pageable, id, null)));
+                manyService.getAll(pageable, id, null));
     }
 
     @Transactional
@@ -42,7 +42,7 @@ public class OneService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        oneRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).delete();
+    public void delete(Long id, Long userId) {
+        oneRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).delete(userId);
     }
 }
