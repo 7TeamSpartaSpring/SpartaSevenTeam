@@ -10,15 +10,19 @@ public record ReviewResponse(
         Long productId,
         Long orderId,
         Long customerId,
+        Long reviewQty,
         Long rating,
         String content,
         LocalDateTime createdAt) {
+
+    // Entity -> DTO 변환 생성자
     public ReviewResponse (Review review) {
         this(
                 review.getId(),
-                review.getProduct(),
-                review.getOrderId(),
-                review.getCustomer(),
+                review.getProduct(),   // productId 위치 (Long)
+                review.getOrder(),     // orderId 위치 (Long)
+                review.getCustomer(),  // customerId 위치 (Long)
+                review.getReviewQty(),
                 review.getRating(),
                 review.getContent(),
                 review.getCreatedAt()
@@ -29,3 +33,4 @@ public record ReviewResponse(
     public ReviewResponse {
     }
 }
+
