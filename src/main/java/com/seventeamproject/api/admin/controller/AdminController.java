@@ -1,4 +1,4 @@
-package com.seventeamproject.admin.controller;
+package com.seventeamproject.api.admin.controller;
 
 import com.seventeamproject.common.security.principal.PrincipalUser;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
-package com.seventeamproject.admin.entity;
+package com.seventeamproject.api.admin.entity;
 
-import com.seventeamproject.admin.enums.AdminRoleEnum;
+import com.seventeamproject.api.admin.enums.AdminRoleEnum;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import com.seventeamproject.example.many.entity.Many;
 import jakarta.persistence.*;

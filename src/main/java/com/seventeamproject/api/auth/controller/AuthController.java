@@ -1,11 +1,9 @@
-package com.seventeamproject.auth.controller;
+package com.seventeamproject.api.auth.controller;
 
 
-import com.seventeamproject.auth.dto.SigninRequest;
-import com.seventeamproject.auth.dto.SigninResponse;
-import com.seventeamproject.auth.dto.SignupRequest;
-import com.seventeamproject.auth.dto.SignupResponse;
-import com.seventeamproject.auth.service.AuthService;
+import com.seventeamproject.api.auth.dto.SigninRequest;
+import com.seventeamproject.api.auth.dto.SignupRequest;
+import com.seventeamproject.api.auth.service.AuthService;
 import com.seventeamproject.common.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

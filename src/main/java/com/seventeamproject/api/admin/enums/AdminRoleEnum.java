@@ -1,4 +1,4 @@
-package com.seventeamproject.admin.enums;
+package com.seventeamproject.api.admin.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

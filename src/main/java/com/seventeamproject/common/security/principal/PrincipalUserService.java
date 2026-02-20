@@ -1,7 +1,7 @@
 package com.seventeamproject.common.security.principal;
 
-import com.seventeamproject.admin.entity.Admin;
-import com.seventeamproject.admin.repository.AdminRepository;
+import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.admin.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
