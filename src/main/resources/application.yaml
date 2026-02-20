@@ -8,9 +8,14 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:customerData.sql
+
   jpa:
     hibernate:
-      ddl-auto: update         # 테이블 자동 생성/업데이트 (실무는 validate, none)
+      ddl-auto: update        # 테이블 자동 생성/업데이트 (실무는 validate, none)
     show-sql: true             # 실행되는 SQL 로그 보기
     properties:
       hibernate:
