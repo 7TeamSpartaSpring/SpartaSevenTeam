@@ -11,7 +11,10 @@ spring:
   sql:
     init:
       mode: always
-      data-locations: classpath:customerData.sql
+      data-locations:
+        - classpath:customerData.sql
+        - classpath:reviewData.sql
+
 
   jpa:
     hibernate:

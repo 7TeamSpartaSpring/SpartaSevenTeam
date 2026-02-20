@@ -1,3 +1,28 @@
+drop table customers;
+
+create table backoffice.customers
+(
+    created_at  datetime(6)  null,
+    created_by  bigint       null,
+    deleted_at  datetime(6)  null,
+    deleted_by  bigint       null,
+    id          bigint auto_increment
+        primary key,
+    modified_at datetime(6)  null,
+    modified_by bigint       null,
+    email       varchar(255) not null,
+    name        varchar(255) null,
+    phone       varchar(255) not null,
+    status      varchar(255) null,
+    constraint UKm3iom37efaxd5eucmxjqqcbe9
+        unique (phone),
+    constraint UKrfbvkrffamfql7cjmen8v976v
+        unique (email)
+);
+
+create index idx_deleted_at
+    on backoffice.customers (deleted_at);
+
 INSERT INTO customers (id, name, email, phone, created_at, modified_at)
 VALUES (1, '김민수', 'minsu1@test.com', '010-1000-0001', '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
        (2, '이서연', 'seoyeon2@test.com', '010-1000-0002', '2025-01-02 10:00:00', '2025-01-02 10:00:00'),
