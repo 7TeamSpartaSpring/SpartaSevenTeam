@@ -10,7 +10,7 @@ public record SignupResponse(Long id,
                              String name,
                              AdminRoleEnum role,
                              LocalDateTime createdAt,
-                             LocalDateTime modifiedA
+                             LocalDateTime modifiedAt
 ) {
     public static SignupResponse from(Admin admin) {
         return new SignupResponse(admin.getId(), admin.getEmail(), admin.getName(), admin.getRole(), admin.getCreatedAt(), admin.getModifiedAt());
