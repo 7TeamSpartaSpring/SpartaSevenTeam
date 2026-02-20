@@ -15,7 +15,7 @@ import org.hibernate.annotations.SQLRestriction;
             @Index(name = "idx_deleted_at", columnList = "deleted_at")
         })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE schedules SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE customers SET deleted_at = now() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Customer extends SoftDeletableEntity {
 
@@ -31,12 +31,14 @@ public class Customer extends SoftDeletableEntity {
     @Column(unique = true, nullable = false)
     private String phone;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CustomerStatus status = CustomerStatus.PENDING;
 
 //    private int totalOrderCount;
 //    private Long totalPayment;
 
-    public Customer(Long id, String name, String email,String phone,String status) {
+    public Customer(Long id, String name, String email,String phone,CustomerStatus status) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -51,7 +53,7 @@ public class Customer extends SoftDeletableEntity {
         return this;
     }
 
-    public Customer updateStatus(String status){
+    public Customer updateStatus(CustomerStatus status){
         this.status = status;
         return this;
     }
