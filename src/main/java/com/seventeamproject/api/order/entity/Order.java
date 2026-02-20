@@ -1,5 +1,6 @@
 package com.seventeamproject.api.order.entity;
 
+import com.seventeamproject.api.customer.entity.Customer;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -42,19 +43,25 @@ public class Order extends SoftDeletableEntity {
     private String registrationManager;
     @Column(length = 200)
     private String cancellationReason;
+    @Version
+    private Long version;
 
-    @Column(name = "customer_id", nullable = false)
-    private Long customerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
-    public static Order create(String orderNumber, Long customerId, String registrationManager, List<OrderItem> items) {
+    public static Order create(String orderNumber, Customer customer, String registrationManager, List<OrderItem> items) {
         if (orderNumber == null || orderNumber.isBlank()) {
             throw new IllegalArgumentException("주문번호는 필수입니다.");
         }
-        if (customerId == null) {
-            throw new IllegalArgumentException("고객 ID는 필수입니다.");
+        if (customer == null) {
+            throw new IllegalArgumentException("고객은 필수입니다.");
+        }
+        if (registrationManager == null || registrationManager.isBlank()) {
+            throw new IllegalArgumentException("담당자명은 필수입니다.");
         }
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("주문 항목은 최소 1개 필요합니다.");
@@ -62,7 +69,7 @@ public class Order extends SoftDeletableEntity {
 
         Order order = new Order();
         order.orderNumber = orderNumber;
-        order.customerId = customerId;
+        order.customer = customer;
         order.status = OrderStatus.READY;
         order.orderedAt = LocalDateTime.now();
         order.registrationManager = registrationManager;
@@ -102,12 +109,5 @@ public class Order extends SoftDeletableEntity {
         }
         this.status = OrderStatus.CANCELED;
         this.cancellationReason = cancelReason;
-    }
-
-    public void assignManager(String registrationManager) {
-        if (registrationManager == null || registrationManager.isBlank()) {
-            throw new IllegalArgumentException("담당자명은 필수입니다.");
-        }
-        this.registrationManager = registrationManager;
     }
 }
