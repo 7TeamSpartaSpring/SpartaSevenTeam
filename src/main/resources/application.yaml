@@ -25,5 +25,5 @@ logging:
     root: info
 
 jwt:
-  secret: nG9QhQWm4f8+YkqC2k0R2g6v7JpH9XlV3Wb1TzQ8sYc=
+  secret: ${JWT_KEY}
   access-token-validity: 691200000
