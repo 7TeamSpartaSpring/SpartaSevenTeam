@@ -2,6 +2,7 @@ package com.seventeamproject.admin.entity;
 
 import com.seventeamproject.admin.enums.AdminRoleEnum;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
+import com.seventeamproject.example.many.entity.Many;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "admins")
+@Table(name = "admin")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Admin extends SoftDeletableEntity {
     @Id

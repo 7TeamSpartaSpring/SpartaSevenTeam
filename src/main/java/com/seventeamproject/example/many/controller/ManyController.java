@@ -53,7 +53,7 @@ public class ManyController {
     @DeleteMapping("/example/manys/{id}")
     public ResponseEntity<Void> delelte(Authentication authentication,
                                         @PathVariable Long id) {
-        manyService.delete(id);
+        manyService.delete(id, ((PrincipalUser) authentication.getPrincipal()).getId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

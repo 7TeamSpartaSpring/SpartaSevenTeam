@@ -1,6 +1,7 @@
 package com.seventeamproject.example.one.controller;
 
 import com.seventeamproject.common.dto.ApiResponse;
+import com.seventeamproject.common.security.principal.PrincipalUser;
 import com.seventeamproject.example.one.dto.OneRequest;
 import com.seventeamproject.example.one.service.OneService;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class OneController {
     @DeleteMapping("/example/ones/{id}")
     public ResponseEntity<Void> delete(Authentication authentication,
                                        @PathVariable Long id) {
-        oneService.delete(id);
+        oneService.delete(id, ((PrincipalUser) authentication.getPrincipal()).getId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
