@@ -1,8 +1,8 @@
 package com.seventeamproject.common.init;
 
-import com.seventeamproject.admin.entity.Admin;
-import com.seventeamproject.admin.enums.AdminRoleEnum;
-import com.seventeamproject.admin.repository.AdminRepository;
+import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.admin.enums.AdminRoleEnum;
+import com.seventeamproject.api.admin.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

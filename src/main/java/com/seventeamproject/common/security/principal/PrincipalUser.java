@@ -1,6 +1,6 @@
 package com.seventeamproject.common.security.principal;
 
-import com.seventeamproject.admin.entity.Admin;
+import com.seventeamproject.api.admin.entity.Admin;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

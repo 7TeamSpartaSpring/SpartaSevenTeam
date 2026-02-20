@@ -1,7 +1,7 @@
-package com.seventeamproject.auth.dto;
+package com.seventeamproject.api.auth.dto;
 
-import com.seventeamproject.admin.entity.Admin;
-import com.seventeamproject.admin.enums.AdminRoleEnum;
+import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.admin.enums.AdminRoleEnum;
 
 import java.time.LocalDateTime;
 

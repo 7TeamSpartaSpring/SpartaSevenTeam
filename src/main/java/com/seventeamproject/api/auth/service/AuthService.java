@@ -1,13 +1,13 @@
-package com.seventeamproject.auth.service;
+package com.seventeamproject.api.auth.service;
 
-import com.seventeamproject.admin.entity.Admin;
-import com.seventeamproject.admin.repository.AdminRepository;
-import com.seventeamproject.auth.dto.SigninRequest;
-import com.seventeamproject.auth.dto.SigninResponse;
-import com.seventeamproject.auth.dto.SignupRequest;
-import com.seventeamproject.auth.dto.SignupResponse;
+import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.admin.repository.AdminRepository;
+import com.seventeamproject.api.auth.dto.SigninRequest;
+import com.seventeamproject.api.auth.dto.SigninResponse;
+import com.seventeamproject.api.auth.dto.SignupRequest;
+import com.seventeamproject.api.auth.dto.SignupResponse;
 import com.seventeamproject.common.security.jwt.JwtProvider;
-import com.seventeamproject.admin.enums.AdminRoleEnum;
+import com.seventeamproject.api.admin.enums.AdminRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

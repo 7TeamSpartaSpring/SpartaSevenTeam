@@ -1,6 +1,6 @@
 package com.seventeamproject.common.security.jwt;
 
-import com.seventeamproject.admin.enums.AdminRoleEnum;
+import com.seventeamproject.api.admin.enums.AdminRoleEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
