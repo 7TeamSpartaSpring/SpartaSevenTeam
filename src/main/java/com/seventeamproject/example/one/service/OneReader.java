@@ -13,7 +13,7 @@ public class OneReader {
     private final OneRepository oneRepository;
 
 
-    public One getEntty(Long id) {
+    public One getEntity(Long id) {
         return oneRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지"));
     }
 }
