@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface AdminRepository extends JpaRepository<Admin, Long> {
     boolean existsByEmailAndDeletedAtIsNull(String email);
     boolean existsByRole(AdminRoleEnum adminRoleEnum);
+    boolean existsByPhoneAndDeletedAtIsNull(String phone);
     Optional<Admin> findByEmail(String email);
     Optional<Admin> findByEmailAndDeletedAtIsNull(String email);
     Optional<Admin> findByIdAndDeletedAtIsNull(Long id);

@@ -1,4 +1,4 @@
 package com.seventeamproject.api.auth.dto;
 
-public record SigninResponse(String jwt) {
+public record LoginResponse(String jwt) {
 }
