@@ -24,7 +24,7 @@ public class ManyService {
         return new ManyResponse(manyRepository.save(new Many(
                 request.content(),
                 request.value(),
-                oneReader.getEntty(id)
+                oneReader.getEntity(id)
         )));
     }
 
