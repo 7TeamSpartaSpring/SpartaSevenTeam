@@ -1,12 +1,15 @@
 package com.seventeamproject.api.review.controller;
 
+import com.seventeamproject.api.review.dto.ReviewResponse;
 import com.seventeamproject.common.dto.ApiResponse;
+import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.security.principal.PrincipalUser;
-import com.seventeamproject.example.many.dto.ManyRequest;
 import com.seventeamproject.api.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,4 +23,17 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    @GetMapping("/v1/reviews")
+    public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getAll(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            Authentication authentication,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer rating
+    ) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(reviewService.getAll(pageable, keyword, rating)));
+    }
 }
+//        PrincipalUser user = (PrincipalUser) authentication.getPrincipal();
+//        log.info(user.getId().toString());
+//        log.info(user.getEmail());
