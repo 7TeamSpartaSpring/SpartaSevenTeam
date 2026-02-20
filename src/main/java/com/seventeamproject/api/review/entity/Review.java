@@ -1,5 +1,6 @@
 package com.seventeamproject.api.review.entity;
 
+import com.seventeamproject.api.product.entity.Product;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -15,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
                 @Index(name = "idx_deleted_at", columnList = "deleted_at")
         })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE schedules SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE reviews SET deleted_at = now() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Review extends SoftDeletableEntity {
 
@@ -29,19 +30,22 @@ public class Review extends SoftDeletableEntity {
 
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "order_id", nullable = false)
-    private Long orderId;
+    @Column(name = "order_id")
+    private Long order;
 
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "customer_id", nullable = false)
     private Long customer;
 
+    private Long reviewQty;
     private Long rating;
     private String content;
 
-    public Review(Long product, Long order, Long customer, Long rating, String content) {
+    public Review(Long product, Long order,  Long customer, Long reviewQty, Long rating, String content) {
         this.product = product;
-        this.orderId = order;
+        this.order = order;
         this.customer = customer;
+        this.reviewQty = reviewQty;
         this.rating = rating;
         this.content = content;
     }
