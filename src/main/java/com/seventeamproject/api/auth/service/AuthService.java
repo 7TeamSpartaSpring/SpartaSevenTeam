@@ -22,22 +22,24 @@ public class AuthService {
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {
-        return SignupResponse.from(adminRepository.save(new Admin(
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                request.name(),
-                AdminRoleEnum.ADMIN,
-                true
-        )));
+//        return SignupResponse.from(adminRepository.save(new Admin(
+//                request.email(),
+//                passwordEncoder.encode(request.password()),
+//                request.name(),
+//                AdminRoleEnum.ADMIN,
+//                true
+//        )));
+        return null;
     }
 
     @Transactional
     public SigninResponse signin(SigninRequest request) {
-        Admin admin = adminRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
-        if (!passwordEncoder.matches(request.password(), admin.getPassword())) {
-            throw new RuntimeException("비밀번호 불일치");
-        }
-        return new SigninResponse(jwtProvider.createToken(admin.getId(), admin.getEmail(), admin.getRole()));
+//        Admin admin = adminRepository.findByEmail(request.email())
+//                .orElseThrow(() -> new RuntimeException("유저 없음"));
+//        if (!passwordEncoder.matches(request.password(), admin.getPassword())) {
+//            throw new RuntimeException("비밀번호 불일치");
+//        }
+//        return new SigninResponse(jwtProvider.createToken(admin.getId(), admin.getEmail(), admin.getRole()));
+        return null;
     }
 }
