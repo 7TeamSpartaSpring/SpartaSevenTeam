@@ -1,6 +1,7 @@
 package com.seventeamproject.api.customer.dto;
 
 import com.seventeamproject.api.customer.entity.Customer;
+import com.seventeamproject.api.customer.entity.CustomerStatus;
 
 import java.time.LocalDateTime;
 
@@ -9,7 +10,7 @@ public record CustomerResponse(
         String name,
         String email,
         String phone,
-        String status,
+        CustomerStatus status,
         LocalDateTime createdAt
 //        , int totalOrderCount,
 //        Long totalPayment
