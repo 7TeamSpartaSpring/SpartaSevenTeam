@@ -27,5 +27,4 @@ public record CustomerResponse(
 //                customer.getTotalPayment()
         );
     }
-
 }
