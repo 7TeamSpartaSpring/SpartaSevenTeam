@@ -7,13 +7,17 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "admin")
+@Table(name = "admin", indexes = @Index(name = "idx_admin_deleted_at", columnList = "deleted_at"))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE admin SET deleted_at = now() WHERE id = ?")
 public class Admin extends SoftDeletableEntity {
 
     @Id
