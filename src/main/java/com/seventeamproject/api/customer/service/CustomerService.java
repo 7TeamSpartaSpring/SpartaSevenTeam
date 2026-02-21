@@ -6,6 +6,8 @@ import com.seventeamproject.api.customer.dto.CustomersResponse;
 import com.seventeamproject.api.customer.entity.CustomerStatus;
 import com.seventeamproject.api.customer.repository.CustomerRepository;
 import com.seventeamproject.common.dto.PageResponse;
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +22,9 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
 
     //전체 조회
-    public PageResponse<CustomersResponse> getAll(String keyword, int page, int size, String sortBy, String direction, Integer statCode) {
+    public PageResponse<CustomersResponse> getAll(
+            String keyword, int page, int size,String sortBy, String direction, String stat
+    ) {
         Sort sort = createSort(sortBy, direction);
 
         Pageable pageable = PageRequest.of(
@@ -30,39 +34,46 @@ public class CustomerService {
         );
 
         CustomerStatus customerStatus =
-                statCode != null ? CustomerStatus.fromStatCode(statCode) : null;
+                stat != null ? CustomerStatus.fromStat(stat) : null;
         return new PageResponse<>(customerRepository.search(pageable, keyword, customerStatus));
     }
 
     //단건 조회
     public CustomerResponse getOne(Pageable pageable, Long id) {
         return new CustomerResponse(
-                customerRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지"))
-//                manyService.getAll(pageable, id, null))
+                customerRepository.findById(id).orElseThrow(
+                        () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
+                )
         );
     }
 
     //정보 수정
     @Transactional
     public CustomerResponse update(Long id, CustomerRequest request) {
+        if(customerRepository.existsByEmail(request.email())){
+            throw new MemberException(ErrorCode.DUPLICATE_EMAIL);
+        }
+        if(customerRepository.existsByPhone(request.phone())){
+            throw new MemberException(ErrorCode.DUPLICATE_PHONE);
+        }
         return new CustomerResponse(customerRepository.findById(id).orElseThrow(
-                () -> new IllegalStateException("적절한 에러 메세지")).update(request.name(), request.email(), request.phone())
-        );
+                () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
+        ).update(request.name(), request.email(), request.phone()));
     }
 
     //상태 수정
     @Transactional
     public CustomerResponse updateStatus(Long id, CustomerRequest request) {
         return new CustomerResponse(customerRepository.findById(id).orElseThrow(
-                () -> new IllegalStateException("적절한 에러 메세지")).updateStatus(CustomerStatus.fromStatCode(request.status()))
-        );
+                () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
+        ).updateStatus(CustomerStatus.fromStat(request.status())));
     }
 
     //단건삭제
     @Transactional
     public void delete(Long customerId, Long userId) {
         customerRepository.findById(customerId).orElseThrow(
-                () -> new IllegalStateException("적절한 에러 메세지")
+                () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
         ).delete(userId);
     }
 
@@ -77,6 +88,9 @@ public class CustomerService {
                 break;
             case "email":
                 property = "email";
+                break;
+            case "phone":
+                property = "phone";
                 break;
             case "createdAt":
                 property = "createdAt";

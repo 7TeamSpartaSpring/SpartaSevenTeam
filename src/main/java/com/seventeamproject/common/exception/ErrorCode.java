@@ -20,6 +20,8 @@ public enum ErrorCode {
     DUPLICATE_PHONE(HttpStatus.BAD_REQUEST, "M003", "이미 존재하는 전화번호입니다."),
     // NOT_FOUND(404): 리소스를 찾을 수 없음
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M004", "회원을 찾을 수 없습니다."),
+    CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND,"M006", "해당하는 고객을 찾을 수 없습니다."),
+    STATUS_NOT_FOUND(HttpStatus.NOT_FOUND,"M007","해당하는 상태 값을 찾을 수 없습니다."),
     // UNAUTHORIZED(401): 인증 실패 (비밀번호 틀림 등)
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "M005", "비밀번호가 일치하지 않습니다."),
     INVALID_PROFILE(HttpStatus.BAD_REQUEST, "P007", "사용자가 일치하지 않습니다."),

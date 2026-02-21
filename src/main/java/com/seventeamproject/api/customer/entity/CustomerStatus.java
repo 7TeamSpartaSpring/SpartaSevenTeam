@@ -1,34 +1,26 @@
 package com.seventeamproject.api.customer.entity;
 
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.MemberException;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
 @Getter
+@RequiredArgsConstructor
 public enum CustomerStatus {
-    PENDING(0),
-    ACTIVATED(1),
-    DEACTIVATED(2),
-    SUSPENDED(3);
+    PENDING,
+    ACTIVATED,
+    DEACTIVATED,
+    SUSPENDED;
 
-    private final int code;
-
-    CustomerStatus(int code){
-        this.code = code;
-    }
-
-    public static CustomerStatus fromStatCode(int statCode){
+    public static CustomerStatus fromStat(String stat){
         for(CustomerStatus status : values()){
-            if(status.code == statCode){
+            if(stat.equals(String.valueOf(status))){
                 return status;
             }
         }
-        throw new IllegalArgumentException("Invalid status: " + statCode);
-
-//        return Arrays.stream(values())
-//                .filter(s -> s.code == statCode)
-//                .findFirst()
-//                .orElseThrow(() ->
-//                        new IllegalArgumentException("Invalid status code"));
+        throw new MemberException(ErrorCode.STATUS_NOT_FOUND);
     }
 }
