@@ -29,7 +29,7 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
     public Page<CustomersResponse> search(
             Pageable pageable,
             String keyword,
-            CustomerStatus status
+            CustomerStatus stat
     ) {
         QCustomer customer = QCustomer.customer;
 //        QOrder orderList = QOrder.order;
@@ -43,8 +43,8 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
             );
         }
 
-        if (status != null) {
-            builder.and(customer.status.eq(status));
+        if (stat != null) {
+            builder.and(customer.status.eq(stat));
         }
 
         JPAQuery<CustomersResponse> query = queryFactory
@@ -65,7 +65,6 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
                         customer.createdAt
                 ))
                 .from(customer)
-//                .leftJoin(user).on(one.userId.eq(user.id))
                 .where(builder
 //                        keywordContains(keyword),statusEqual(status)
                 );
@@ -90,7 +89,9 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
     }
 //
 //    private BooleanExpression keywordContains(String keyword) {
-//        return keyword != null ? customer.name.contains(keyword).or(customer.email.contains(keyword)) : null;
+//        return keyword != null ?
+//                customer.name.contains(keyword)
+//                        .or(customer.email.contains(keyword)) : null;
 //    }
 //
 //    private BooleanExpression statusEqual(CustomerStatus status){
@@ -110,10 +111,12 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
                 return new OrderSpecifier<>(direction, customer.name);
             case "email":
                 return new OrderSpecifier<>(direction, customer.email);
+            case "phone":
+                return new OrderSpecifier<>(direction,customer.phone);
             case "createdAt":
                 return new OrderSpecifier<>(direction, customer.createdAt);
             default:
-                return new OrderSpecifier<>(Order.DESC, customer.createdAt);
+                return new OrderSpecifier<>(Order.ASC, customer.createdAt);
         }
     }
 }

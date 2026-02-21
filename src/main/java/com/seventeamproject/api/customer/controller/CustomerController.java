@@ -24,10 +24,12 @@ public class CustomerController {
                                               @RequestParam(defaultValue = "1") int page,
                                               @RequestParam(defaultValue = "10") int size,
                                               @RequestParam(defaultValue = "createdAt") String sortBy,
-                                              @RequestParam(defaultValue = "desc") String direction,
-                                              @RequestParam(required = false) Integer statCode
+                                              @RequestParam(defaultValue = "asc") String direction,
+                                              @RequestParam(required = false) String stat
                                               ) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(customerService.getAll(keyword, page, size, sortBy, direction, statCode)));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse
+                .success(customerService.getAll(keyword, page, size, sortBy, direction, stat))
+        );
     }
 
     // 상세조회
@@ -35,7 +37,9 @@ public class CustomerController {
     public ResponseEntity<ApiResponse> get(Authentication authentication,
                                            Pageable pageable,
                                            @PathVariable Long customerId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(customerService.getOne(pageable, customerId)));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse
+                .success(customerService.getOne(pageable, customerId))
+        );
     }
 
     // 정보 수정
@@ -43,15 +47,19 @@ public class CustomerController {
     public ResponseEntity<ApiResponse> update(Authentication authentication,
                                               @PathVariable Long customerId,
                                               @RequestBody CustomerRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(customerService.update(customerId, request)));
-    }
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse
+                .success(customerService.update(customerId, request))
+        );
+    }//TODO: request 분리 할 것 인가
 
     //상태 수정
     @PatchMapping("/v1/customers/{customerId}")
     public ResponseEntity<ApiResponse> updateStatus(Authentication authentication,
                                               @PathVariable Long customerId,
                                               @RequestBody CustomerRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(customerService.updateStatus(customerId, request)));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse
+                .success(customerService.updateStatus(customerId, request))
+        );
     }
 
     //삭제
