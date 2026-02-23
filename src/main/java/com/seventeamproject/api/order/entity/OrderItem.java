@@ -1,6 +1,6 @@
 package com.seventeamproject.api.order.entity;
 
-import com.seventeamproject.api.product.entity.Product;
+import com.seventeamproject.api.product.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

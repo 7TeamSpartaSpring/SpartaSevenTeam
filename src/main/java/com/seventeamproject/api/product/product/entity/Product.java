@@ -1,9 +1,9 @@
-package com.seventeamproject.api.product.entity;
+package com.seventeamproject.api.product.product.entity;
 
 import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.product.category.entity.Category;
+import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
-import com.seventeamproject.example.many.entity.Many;
-import com.seventeamproject.example.one.entity.One;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,26 +28,28 @@ public class Product extends SoftDeletableEntity {
     private String name;
     private Long price;
     private Long totalQty;
-    private String status;
-    private Long categoryId;
+    @Enumerated(EnumType.STRING)
+    private ProductStatusEnum status;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
 
-    private Long value;
-
-    public Product(String name, Long categoryId, Long price, Long totalQty, String status) {
+    public Product(String name, Category category, Long price, Long totalQty, ProductStatusEnum status, Admin admin) {
         this.name = name;
-        this.categoryId = categoryId;
+        this.category = category;
         this.price = price;
         this.totalQty = totalQty;
         this.status = status;
+        this.admin = admin;
     }
 
-    public Product update(String name, Long categoryId, Long price) {
+    public Product update(String name, Category category, Long price) {
         this.name = name;
-        this.categoryId = categoryId;
+        this.category = category;
         this.price = price;
         return this;
     }
