@@ -38,7 +38,9 @@ public class Review extends SoftDeletableEntity {
     private Long customer;
 
     private Long reviewQty;
+    @Column(nullable = false)
     private Long rating;
+    @Column(nullable = false, length = 100)
     private String content;
 
     public Review(Long product, Long order,  Long customer, Long reviewQty, Long rating, String content) {
@@ -48,6 +50,11 @@ public class Review extends SoftDeletableEntity {
         this.reviewQty = reviewQty;
         this.rating = rating;
         this.content = content;
+    }
+
+    public Review update(String content) {
+        this.content = content;
+        return this;
     }
 }
 
