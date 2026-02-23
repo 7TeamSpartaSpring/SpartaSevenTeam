@@ -1,4 +1,4 @@
-
+drop table backoffice.reviews;
 
 create table backoffice.reviews
 (
