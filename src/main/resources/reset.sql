@@ -10,5 +10,6 @@ TRUNCATE TABLE backoffice.products;
 TRUNCATE TABLE backoffice.customers;
 TRUNCATE TABLE backoffice.categorys;
 TRUNCATE TABLE backoffice.admin;
+TRUNCATE TABLE backoffice.order_items;
 
 SET FOREIGN_KEY_CHECKS = 1;

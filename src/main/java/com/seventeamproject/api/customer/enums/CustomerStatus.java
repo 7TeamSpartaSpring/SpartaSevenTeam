@@ -1,19 +1,19 @@
-package com.seventeamproject.api.customer.entity;
+package com.seventeamproject.api.customer.enums;
 
 import com.seventeamproject.common.exception.ErrorCode;
 import com.seventeamproject.common.exception.MemberException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
-
 @Getter
 @RequiredArgsConstructor
 public enum CustomerStatus {
-    PENDING,
-    ACTIVATED,
-    DEACTIVATED,
-    SUSPENDED;
+    PENDING("승인대기"),
+    ACTIVE("활성"),
+    INACTIVE("비활성"),
+    SUSPENDED("정지");
+
+    private final String title;
 
     public static CustomerStatus fromStat(String stat){
         for(CustomerStatus status : values()){

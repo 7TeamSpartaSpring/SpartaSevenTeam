@@ -1,11 +1,12 @@
 package com.seventeamproject.api.customer.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.seventeamproject.api.customer.entity.Customer;
 import com.seventeamproject.api.customer.enums.CustomerStatus;
 
 import java.time.LocalDateTime;
 
-public record CustomersResponse(
+public record GetCustomerResponse(
         Long id,
         String name,
         String email,
@@ -17,7 +18,5 @@ public record CustomersResponse(
         LocalDateTime createdAt
 ) {
     @QueryProjection
-    public CustomersResponse{
-
-    }
+    public GetCustomerResponse{}
 }
