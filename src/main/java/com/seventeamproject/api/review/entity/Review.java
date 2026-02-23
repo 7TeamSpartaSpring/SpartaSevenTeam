@@ -1,6 +1,5 @@
 package com.seventeamproject.api.review.entity;
 
-import com.seventeamproject.api.product.entity.Product;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
