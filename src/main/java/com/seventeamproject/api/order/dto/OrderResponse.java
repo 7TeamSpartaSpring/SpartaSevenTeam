@@ -1,6 +1,7 @@
 package com.seventeamproject.api.order.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.order.entity.Order;
 import com.seventeamproject.api.order.entity.OrderStatus;
 
@@ -14,7 +15,9 @@ public record OrderResponse(
         LocalDateTime orderedAt,
         Long totalAmount,
         List<OrderItemResponse> items,
+        Long createdBy,
         LocalDateTime createdAt,
+        Long modifiedBy,
         LocalDateTime modifiedAt
 ) {
 
@@ -25,7 +28,9 @@ public record OrderResponse(
                 order.getOrderedAt(),
                 order.getTotalAmount(),
                 order.getItems().stream().map(OrderItemResponse::from).toList(),
+                order.getCreatedBy(),
                 order.getCreatedAt(),
+                order.getModifiedBy(),
                 order.getModifiedAt());
 
     }

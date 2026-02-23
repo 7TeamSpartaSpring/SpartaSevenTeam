@@ -36,11 +36,13 @@ public class Order extends SoftDeletableEntity {
     @Column(nullable = false)
     private OrderStatus status;
     @Column(nullable = false)
+    private Long totalQuantity; // 주문 총 수량
+    @Column(nullable = false)
     private Long totalAmount; // 주문 합계
     @Column(nullable = false)
     private LocalDateTime orderedAt;
-    @Column(length = 200)
-    private String registrationManager;
+    @Column(name = "registration_admin_id", nullable = false)
+    private Long registrationManagerId;
     @Column(length = 200)
     private String cancellationReason;
     @Version
@@ -53,15 +55,15 @@ public class Order extends SoftDeletableEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
-    public static Order create(String orderNumber, Customer customer, String registrationManager, List<OrderItem> items) {
+    public static Order create(String orderNumber, Customer customer, Long registrationManagerId, List<OrderItem> items) {
         if (orderNumber == null || orderNumber.isBlank()) {
             throw new IllegalArgumentException("주문번호는 필수입니다.");
         }
         if (customer == null) {
             throw new IllegalArgumentException("고객은 필수입니다.");
         }
-        if (registrationManager == null || registrationManager.isBlank()) {
-            throw new IllegalArgumentException("담당자명은 필수입니다.");
+        if (registrationManagerId == null) {
+            throw new IllegalArgumentException("담당자 ID는 필수입니다.");
         }
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("주문 항목은 최소 1개 필요합니다.");
@@ -72,7 +74,7 @@ public class Order extends SoftDeletableEntity {
         order.customer = customer;
         order.status = OrderStatus.READY;
         order.orderedAt = LocalDateTime.now();
-        order.registrationManager = registrationManager;
+        order.registrationManagerId = registrationManagerId;
 
         for (OrderItem item : items) {
             order.addItem(item);
@@ -88,6 +90,9 @@ public class Order extends SoftDeletableEntity {
     }
 
     public void recalculateTotalAmount() {
+        this.totalQuantity = items.stream()
+                .mapToLong(OrderItem::getQuantity)
+                .sum();
         this.totalAmount = items.stream()
                 .mapToLong(OrderItem::getTotalAmount)
                 .sum();

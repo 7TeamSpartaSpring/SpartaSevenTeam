@@ -1,6 +1,5 @@
 package com.seventeamproject.api.order.dto;
 
-import com.seventeamproject.api.order.entity.OrderItem;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;

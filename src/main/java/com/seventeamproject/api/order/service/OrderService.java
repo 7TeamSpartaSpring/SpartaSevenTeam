@@ -1,17 +1,19 @@
 package com.seventeamproject.api.order.service;
 
+import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.admin.repository.AdminRepository;
 import com.seventeamproject.api.customer.entity.Customer;
 import com.seventeamproject.api.customer.repository.CustomerRepository;
 import com.seventeamproject.api.order.dto.*;
 import com.seventeamproject.api.order.entity.Order;
 import com.seventeamproject.api.order.entity.OrderItem;
+import com.seventeamproject.api.order.entity.OrderStatus;
 import com.seventeamproject.api.order.repository.OrderRepository;
 import com.seventeamproject.api.product.entity.Product;
 import com.seventeamproject.api.product.repository.ProductRepository;
 import com.seventeamproject.api.product.service.ProductService;
 import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.security.principal.PrincipalUser;
-import com.seventeamproject.example.one.service.OneReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -20,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -32,13 +33,13 @@ public class OrderService {
     private final ProductService productService;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-    private final OneReader oneReader;
+    private final AdminRepository adminRepository;
 
     // 생성
     @Transactional
     public OrderResponse save(Authentication authentication, CreateOrderRequest request) {
         PrincipalUser admin = (PrincipalUser) authentication.getPrincipal();
-        String managerName = admin.getUsername();
+        Long managerId = admin.getId();
 
         Customer customer = customerRepository.findById(request.customerId()).orElseThrow(
                 () -> new RuntimeException("존재하지 않는 고객입니다."));
@@ -60,17 +61,33 @@ public class OrderService {
         }
         String orderNumber = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        return new OrderResponse(orderRepository.save(Order.create(orderNumber, customer, managerName, items)));
+        return new OrderResponse(orderRepository.save(Order.create(orderNumber, customer, managerId, items)));
     }
 
-    public PageResponse<OrderResponse> getAll(Pageable pageable, Long id, String content) {
-        return new PageResponse<>(orderRepository.search(pageable, id, content));
+
+
+
+    //전체조회
+    public PageResponse<OrderListResponse> getAll(Pageable pageable, String keyword, OrderStatus status) {
+        return new PageResponse<>(
+                orderRepository.search(pageable, keyword, status)
+                        .map(order -> OrderListResponse.from(order, resolveManagerName(order)))
+        );
     }
 
-    public OrderResponse getOne(Long id) {
-        return new OrderResponse(orderRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")));
-    }
+    //단건조회
+    public GetOneOrderResponse getOne(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 주문"));
 
+        Admin admin = null;
+        if (order.getRegistrationManagerId() != null) {
+            admin = adminRepository.findById(order.getRegistrationManagerId())
+                    .orElseThrow(() -> new IllegalStateException("존재하지 않는 관리자"));
+        }
+
+        return new GetOneOrderResponse(order, admin);
+    }
 
     //상태변경
     @Transactional
@@ -85,5 +102,14 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalStateException("존재하지않는 주문ID입니다."));
         order.cancel(request.cancellationReason());
         return new OrderResponse(order);
+    }
+
+    private String resolveManagerName(Order order) {
+        if (order.getRegistrationManagerId() == null) {
+            return null;
+        }
+        return adminRepository.findById(order.getRegistrationManagerId())
+                .map(Admin::getName)
+                .orElse(null);
     }
 }

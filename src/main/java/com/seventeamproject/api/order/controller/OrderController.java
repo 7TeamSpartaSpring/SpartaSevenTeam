@@ -1,9 +1,9 @@
 package com.seventeamproject.api.order.controller;
 
 import com.seventeamproject.api.order.dto.*;
+import com.seventeamproject.api.order.entity.OrderStatus;
 import com.seventeamproject.api.order.service.OrderService;
 import com.seventeamproject.common.dto.ApiResponse;
-import com.seventeamproject.common.security.principal.PrincipalUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,46 +24,44 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> save(
             Authentication authentication,
             @Valid @RequestBody CreateOrderRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(orderService.save(authentication, request)));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(orderService.save(authentication, request)));
     }
 
     //전체조회
     @GetMapping("/v1/orders")
     public ResponseEntity<ApiResponse> getAll(
-            Authentication authentication,
             Pageable pageable,
-            @PathVariable Long id,
-            @RequestParam(required = false) String content
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) OrderStatus status
     ) {
-        PrincipalUser user = (PrincipalUser) authentication.getPrincipal();
-        log.info(user.getId().toString());
-        log.info(user.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(orderService.getAll(pageable, id, content)));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(orderService.getAll(pageable, keyword, status)));
     }
 
     // 단건조회
     @GetMapping("/v1/orders/{orderId}")
-    public ResponseEntity<ApiResponse> get(
-            Authentication authentication,
+    public ResponseEntity<ApiResponse<GetOneOrderResponse>> get(
             @PathVariable Long orderId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(orderService.getOne(orderId)));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(orderService.getOne(orderId)));
     }
 
     // 상태변경
     @PatchMapping("/v1/orders/{orderId}/status")
     public ResponseEntity<ApiResponse<OrderResponse>> update(
-            Authentication authentication,
             @PathVariable Long orderId,
             @Valid @RequestBody StatusUpdateRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(orderService.update(orderId, request)));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(orderService.update(orderId, request)));
     }
 
     // 주문취소
     @PatchMapping("/v1/orders/{orderId}/cancel")
     public ResponseEntity<ApiResponse<OrderResponse>> cancel(
-            Authentication authentication,
             @PathVariable Long orderId,
             @Valid @RequestBody OrderCancelRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(orderService.cancel(orderId, request)));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(orderService.cancel(orderId, request)));
     }
 }
