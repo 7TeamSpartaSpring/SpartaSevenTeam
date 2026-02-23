@@ -7,6 +7,8 @@ import com.seventeamproject.api.auth.dto.LoginRequest;
 import com.seventeamproject.api.auth.dto.LoginResponse;
 import com.seventeamproject.api.auth.dto.SignupRequest;
 import com.seventeamproject.api.auth.dto.SignupResponse;
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.MemberException;
 import com.seventeamproject.common.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,11 +27,11 @@ public class AuthService {
     public SignupResponse signup(SignupRequest request) {
 
         if (adminRepository.existsByEmailAndDeletedAtIsNull(request.email())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다");
+            throw new MemberException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         if (adminRepository.existsByPhoneAndDeletedAtIsNull(request.phone())) {
-            throw new IllegalArgumentException("이미 사용 중인 전화번호입니다");
+            throw new MemberException(ErrorCode.DUPLICATE_PHONE);
         }
 
         Admin admin = new Admin(
@@ -48,15 +50,15 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
 
         Admin admin = adminRepository.findByEmailAndDeletedAtIsNull(request.email()).orElseThrow(
-                () -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다")
+                () -> new MemberException(ErrorCode.INVALID_CREDENTIALS)
         );
 
         if (!passwordEncoder.matches(request.password(), admin.getPassword())) {
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다");
+            throw new MemberException(ErrorCode.INVALID_CREDENTIALS);
         }
 
         if (admin.getStatus() != AdminStatusEnum.ACTIVE || admin.isDeleted()) {
-            throw new IllegalStateException("로그인 할 수 없는 계정 상태입니다: " + admin.getStatus());
+            throw new MemberException(ErrorCode.ADMIN_NOT_ACTIVE);
         }
 
         String token = jwtProvider.createToken(admin.getId(), admin.getEmail(), admin.getRole());

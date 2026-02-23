@@ -23,5 +23,4 @@ public record SignupRequest(
 
         @NotNull(message = "역할은 필수입니다.")
         AdminRoleEnum role
-        ) {
-}
+        ) {}
