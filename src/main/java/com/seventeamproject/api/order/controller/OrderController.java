@@ -1,9 +1,10 @@
 package com.seventeamproject.api.order.controller;
 
 import com.seventeamproject.api.order.dto.*;
-import com.seventeamproject.api.order.entity.OrderStatus;
+import com.seventeamproject.api.order.enums.OrderStatus;
 import com.seventeamproject.api.order.service.OrderService;
 import com.seventeamproject.common.dto.ApiResponse;
+import com.seventeamproject.common.dto.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     private final OrderService orderService;
 
+    //생성
     @PostMapping("/v1/orders")
     public ResponseEntity<ApiResponse<OrderResponse>> save(
             Authentication authentication,
@@ -30,7 +32,7 @@ public class OrderController {
 
     //전체조회
     @GetMapping("/v1/orders")
-    public ResponseEntity<ApiResponse> getAll(
+    public ResponseEntity<ApiResponse<PageResponse<OrderListResponse>>> getAll(
             Pageable pageable,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) OrderStatus status
@@ -65,3 +67,5 @@ public class OrderController {
                 .body(ApiResponse.success(orderService.cancel(orderId, request)));
     }
 }
+
+

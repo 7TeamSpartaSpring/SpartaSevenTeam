@@ -18,20 +18,21 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    private Order order;  // 주문 연관관계
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    private Product product;  // 상품 연관관계
 
     @Column(nullable = false)
-    private Long quantity;
+    private Long quantity;  // 주문수량
 
     @Column(nullable = false)
     private Long orderPrice; // 주문 당시 상품 가격 스냅샷
 
     @Column(nullable = false)
     private Long totalAmount; // orderPrice * quantity
+
 
     public static OrderItem of(Product product, Long quantity, Long orderPrice) {
         if (product == null) {

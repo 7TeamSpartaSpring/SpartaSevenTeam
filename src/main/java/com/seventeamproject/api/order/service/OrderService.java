@@ -7,7 +7,7 @@ import com.seventeamproject.api.customer.repository.CustomerRepository;
 import com.seventeamproject.api.order.dto.*;
 import com.seventeamproject.api.order.entity.Order;
 import com.seventeamproject.api.order.entity.OrderItem;
-import com.seventeamproject.api.order.entity.OrderStatus;
+import com.seventeamproject.api.order.enums.OrderStatus;
 import com.seventeamproject.api.order.repository.OrderRepository;
 import com.seventeamproject.api.product.product.entity.Product;
 import com.seventeamproject.api.product.product.repository.ProductRepository;
@@ -38,14 +38,17 @@ public class OrderService {
     // 생성
     @Transactional
     public OrderResponse save(Authentication authentication, CreateOrderRequest request) {
+        // 담당자정보가져오기
         PrincipalUser admin = (PrincipalUser) authentication.getPrincipal();
         Long managerId = admin.getId();
 
+        // 고객정보가져오기
         Customer customer = customerRepository.findById(request.customerId()).orElseThrow(
                 () -> new RuntimeException("존재하지 않는 고객입니다."));
 
         List<OrderItem> items = new ArrayList<>();
 
+        // 상품확인및 재고확인
         for (OrderItemRequest item : request.items()) {
             Long productId = item.productId();
             Long qty = item.quantity();
@@ -59,6 +62,7 @@ public class OrderService {
 
             items.add(OrderItem.of(product, qty, product.getPrice()));
         }
+        //주문번호 랜덤값지정
         String orderNumber = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         return new OrderResponse(orderRepository.save(Order.create(orderNumber, customer, managerId, items)));
@@ -113,3 +117,5 @@ public class OrderService {
                 .orElse(null);
     }
 }
+
+

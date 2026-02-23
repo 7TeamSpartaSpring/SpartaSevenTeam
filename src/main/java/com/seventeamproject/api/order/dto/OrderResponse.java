@@ -1,9 +1,8 @@
 package com.seventeamproject.api.order.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.order.entity.Order;
-import com.seventeamproject.api.order.entity.OrderStatus;
+import com.seventeamproject.api.order.enums.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,3 +38,5 @@ public record OrderResponse(
     public OrderResponse {
     }
 }
+
+
