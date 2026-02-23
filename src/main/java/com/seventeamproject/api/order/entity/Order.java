@@ -1,6 +1,7 @@
 package com.seventeamproject.api.order.entity;
 
 import com.seventeamproject.api.customer.entity.Customer;
+import com.seventeamproject.api.order.enums.OrderStatus;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -30,32 +31,34 @@ public class Order extends SoftDeletableEntity {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 30)
-    private String orderNumber;
+    private String orderNumber; // 주문번호
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus status;
+    private OrderStatus status;  // 주문상태
     @Column(nullable = false)
     private Long totalQuantity; // 주문 총 수량
     @Column(nullable = false)
     private Long totalAmount; // 주문 합계
     @Column(nullable = false)
-    private LocalDateTime orderedAt;
+    private LocalDateTime orderedAt; // 주문시간
     @Column(name = "registration_admin_id", nullable = false)
-    private Long registrationManagerId;
+    private Long registrationManagerId; // cs주문시담당자
     @Column(length = 200)
-    private String cancellationReason;
+    private String cancellationReason;  // 취소사유
     @Version
-    private Long version;
+    private Long version;  // 낙관적락
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    private Customer customer;  // 고객 연관관계 1:N
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items = new ArrayList<>();
+    private List<OrderItem> items = new ArrayList<>(); // 상품(리스트) 연관관계 N:M
 
+    // 이방법으로만 생성가능 like 생성자
     public static Order create(String orderNumber, Customer customer, Long registrationManagerId, List<OrderItem> items) {
+       //validate
         if (orderNumber == null || orderNumber.isBlank()) {
             throw new IllegalArgumentException("주문번호는 필수입니다.");
         }
@@ -72,23 +75,25 @@ public class Order extends SoftDeletableEntity {
         Order order = new Order();
         order.orderNumber = orderNumber;
         order.customer = customer;
-        order.status = OrderStatus.READY;
+        order.status = OrderStatus.READY; // 주문하면 준비상태
         order.orderedAt = LocalDateTime.now();
-        order.registrationManagerId = registrationManagerId;
+        order.registrationManagerId = registrationManagerId; // sc주문이므로 담당자필수
 
-        for (OrderItem item : items) {
+        for (OrderItem item : items) {  // 주문상품 담는로직
             order.addItem(item);
         }
-        order.recalculateTotalAmount();
+        order.recalculateTotalAmount(); // 총금액 계산로직
         return order;
     }
 
+    // 주문상품 담는로직
     public void addItem(OrderItem item) {
         Objects.requireNonNull(item, "주문 항목은 필수입니다.");
         items.add(item);
         item.setOrder(this);
     }
 
+    // 총금액 계산로직
     public void recalculateTotalAmount() {
         this.totalQuantity = items.stream()
                 .mapToLong(OrderItem::getQuantity)
@@ -98,10 +103,12 @@ public class Order extends SoftDeletableEntity {
                 .sum();
     }
 
+    // 주문상태변경
     public void updateStatus(OrderStatus status) {
         this.status = Objects.requireNonNull(status, "주문 상태는 필수입니다.");
     }
 
+    //주문취소
     public void cancel(String cancelReason) {
         if (this.status == OrderStatus.CANCELED) {
             throw new IllegalStateException("이미 취소된 요청");
@@ -116,3 +123,4 @@ public class Order extends SoftDeletableEntity {
         this.cancellationReason = cancelReason;
     }
 }
+
