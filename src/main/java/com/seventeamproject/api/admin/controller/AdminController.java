@@ -1,13 +1,17 @@
 package com.seventeamproject.api.admin.controller;
 
-import com.seventeamproject.api.admin.dto.ChangePasswordRequest;
-import com.seventeamproject.api.admin.dto.RejectRequest;
-import com.seventeamproject.api.admin.dto.UpdateMeRequest;
+import com.seventeamproject.api.admin.dto.*;
+import com.seventeamproject.api.admin.enums.AdminRoleEnum;
+import com.seventeamproject.api.admin.enums.AdminStatusEnum;
 import com.seventeamproject.api.admin.service.AdminService;
 import com.seventeamproject.common.dto.ApiResponse;
+import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.security.principal.PrincipalUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +29,8 @@ public class AdminController {
     @GetMapping("/v1/admin/me")
     public ResponseEntity<ApiResponse> me(Authentication authentication) {
         PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(adminService.getMe(principal.getId())));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(adminService.getMe(principal.getId())));
     }
 
     // 관리자 내 프로필 수정
@@ -35,7 +40,8 @@ public class AdminController {
             @Valid @RequestBody UpdateMeRequest request
     ) {
         PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(adminService.updateMe(principal.getId(), request)));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(adminService.updateMe(principal.getId(), request)));
     }
 
     // 관리자 내 비밀번호 변경
@@ -66,26 +72,93 @@ public class AdminController {
             @Valid @RequestBody RejectRequest request
     ) {
         adminService.reject(adminId, request.reason());
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success("거부 완료"));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("거부 완료"));
     }
 
+    // 관리자 관리용 - 관리자 목록 조회 (SUPER_ADMIN만 가능)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @GetMapping("/v1/admin")
+    public ResponseEntity<ApiResponse<PageResponse<AdminResponse>>> getAdmin(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false)AdminRoleEnum role,
+            @RequestParam(required = false)AdminStatusEnum status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder
+    ) {
+        if (page < 1) throw new IllegalArgumentException("page는 1 이상이어야 합니다");
+        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다");
 
-//    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-//    @GetMapping("/admin/info")
-//    public ResponseEntity<String> getAdminInfo(Authentication authentication) {
-//        PrincipalUser user = (PrincipalUser) authentication.getPrincipal();
-//        String userId = user.getEmail();
-//
-//        return ResponseEntity.ok("현재 사용자: " + userId);
-//    }
-//
-//    @PreAuthorize("hasRole('SUPER_ADMIN')")
-//    @GetMapping("/admin/super/info")
-//    public ResponseEntity<String> getSuperAdminInfo(Authentication authentication) {
-//        PrincipalUser user = (PrincipalUser) authentication.getPrincipal();
-//        String userId = user.getEmail();
-//
-//        return ResponseEntity.ok("현재 사용자: " + userId);
-//    }
+        Sort.Direction direction;
+        try {
+            direction = Sort.Direction.fromString(sortOrder);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("");
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
+        PageResponse<AdminResponse> result = adminService.getAdmin(pageable, keyword, role, status);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(result));
+    }
+
+    // 관리자 관리용 - 관리자 목록 상세 조회 (SUPER_ADMIN만 가능)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @GetMapping("/v1/admin/{adminId}")
+    public ResponseEntity<ApiResponse<AdminResponse>> getAdminDetail(
+            @PathVariable Long adminId
+    ) {
+        AdminResponse result = adminService.getAdminDetail(adminId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(result));
+    }
+
+    // 관리자 관리용 - 관리자 정보 수정 (SUPER_ADMIN만 가능)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PutMapping("/v1/admin/{adminId}")
+    public ResponseEntity<ApiResponse<AdminResponse>> updateAdmin(
+            @PathVariable Long adminId,
+            @Valid @RequestBody UpdateAdminRequest request
+    ) {
+        AdminResponse result = adminService.updateAdmin(adminId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(result));
+    }
+
+    // 관리자 관리용 - 관리자 상태 변경 (SUPER_ADMIN만 가능)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PutMapping("/v1/admin/{adminId}/status")
+    public ResponseEntity<ApiResponse<String>> changeStatus(
+            @PathVariable Long adminId,
+            @Valid @RequestBody ChangeStatusRequest request
+    ) {
+        adminService.changeStatus(adminId, request.status());
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("상태 변경 완료"));
+    }
+
+    // 관리자 관리용 - 관리자 역할 변경 (SUPER_ADMIN만 가능)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PatchMapping("/v1/admin/{adminId}/role")
+    public ResponseEntity<ApiResponse<String>> changeRole(
+            Authentication authentication,
+            @PathVariable Long adminId,
+            @Valid @RequestBody ChangeRoleRequest request
+    ) {
+        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        adminService.changeRole(principal.getId(), adminId, request.role());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success("역할 변경 완료"));
+    }
+
+    // 관리자 관리용 - 관리자 삭제 (SUPER_ADMIN만 가능)
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @DeleteMapping("/v1/admin/{adminId}")
+    public ResponseEntity<ApiResponse<String>> deleteAdmin(
+            Authentication authentication,
+            @PathVariable Long adminId
+    ) {
+        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        adminService.deleteAdmin(principal.getId(), adminId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("삭제 완료"));
+    }
 }

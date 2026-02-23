@@ -18,14 +18,33 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "M001", "이미 존재하는 이메일입니다."),
     DUPLICATE_USERNAME(HttpStatus.BAD_REQUEST, "M002", "이미 존재하는 사용자 이름입니다."),
     DUPLICATE_PHONE(HttpStatus.BAD_REQUEST, "M003", "이미 존재하는 전화번호입니다."),
+
+    // UNAUTHORIZED(401): 인증 실패 (비밀번호 틀림 등)
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "M005", "비밀번호가 일치하지 않습니다."),
+
+    // FORBIDDEN(403) - 접근/상태 제한
+    ADMIN_NOT_ACTIVE(HttpStatus.FORBIDDEN, "M009", "로그인할 수 없는 관리자 상태입니다."),
+
     // NOT_FOUND(404): 리소스를 찾을 수 없음
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M004", "회원을 찾을 수 없습니다."),
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND,"M006", "해당하는 고객을 찾을 수 없습니다."),
     STATUS_NOT_FOUND(HttpStatus.NOT_FOUND,"M007","해당하는 상태 값을 찾을 수 없습니다."),
-    // UNAUTHORIZED(401): 인증 실패 (비밀번호 틀림 등)
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "M005", "비밀번호가 일치하지 않습니다."),
+    ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "M008", "관리자를 찾을 수 없습니다."),
+
+    // CONFLICT(409) - 상태 충돌
+    INVALID_STATUS_CHANGE(HttpStatus.CONFLICT, "M010", "허용되지 않은 상태 전환입니다."),
+
+
+
+    // Permission / Auth 인증 인가, 보안 관련 에러 (P로 시작)
+    // BAD_REQUEST(404)
     INVALID_PROFILE(HttpStatus.BAD_REQUEST, "P007", "사용자가 일치하지 않습니다."),
-    STATE_NOT_LOGIN(HttpStatus.BAD_REQUEST,"P008","로그인되어있지않습니다."),
+    STATE_NOT_LOGIN(HttpStatus.BAD_REQUEST,"P008","로그인되어 있지 않습니다."),
+
+    // UNAUTHORIZED(401) - 인증 실패(이메일/비번 불일치)
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "P009", "이메일 또는 비밀번호가 일치하지 않습니다."),
+
+
 
     // Common (공통) 에러 코드 (C로 시작)
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", "잘못된 입력값입니다."),
