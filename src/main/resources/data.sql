@@ -20,11 +20,11 @@ VALUES
 INSERT IGNORE INTO backoffice.customers
 (created_at, created_by, deleted_at, deleted_by, modified_at, modified_by, email, name, phone, status)
 VALUES
-    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'alice@example.com', '김앨리스', '010-1111-0001', 'ACTIVATED'),
-    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'bob@example.com',   '이밥',     '010-1111-0002', 'ACTIVATED'),
+    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'alice@example.com', '김앨리스', '010-1111-0001', 'ACTIVE'),
+    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'bob@example.com',   '이밥',     '010-1111-0002', 'ACTIVE'),
     (NOW(), NULL, NULL, NULL, NOW(), NULL, 'carol@example.com', '박캐롤',   '010-1111-0003', 'PENDING'),
     (NOW(), NULL, NULL, NULL, NOW(), NULL, 'dave@example.com',  '최데이브', '010-1111-0004', 'SUSPENDED'),
-    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'eve@example.com',   '정이브',   '010-1111-0005', 'DEACTIVATED');
+    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'eve@example.com',   '정이브',   '010-1111-0005', 'INACTIVE');
 
 -- 2. products (admin_id → admin, category_id → categorys 참조)
 INSERT IGNORE INTO backoffice.products
@@ -41,7 +41,7 @@ INSERT IGNORE INTO backoffice.orders
 (created_at, created_by, deleted_at, deleted_by, modified_at, modified_by, ordered_at, registration_admin_id, total_amount, total_quantity, version, order_number, cancellation_reason, status, customer_id)
 VALUES
     (NOW(), 1, NULL, NULL, NOW(), 1, NOW(), 1, 15000, 1, 1, 'ORD-2025-00001', NULL,        'COMPLETED', 1),
-    (NOW(), 1, NULL, NULL, NOW(), 1, NOW(), 1, 64000, 3, 1, 'ORD-2025-00002', NULL,        'SHIPPING',  2),
+    (NOW(), 1, NULL, NULL, NOW(), 1, NOW(), 1, 75000, 3, 1, 'ORD-2025-00002', NULL,        'SHIPPING',  2),
     (NOW(), 1, NULL, NULL, NOW(), 1, NOW(), 1, 39000, 1, 1, 'ORD-2025-00003', NULL,        'READY',     3),
     (NOW(), 1, NULL, NULL, NOW(), 1, NOW(), 1,  8000, 1, 1, 'ORD-2025-00004', '고객 변심', 'CANCELED',  4),
     (NOW(), 1, NULL, NULL, NOW(), 1, NOW(), 1, 27000, 2, 1, 'ORD-2025-00005', NULL,        'COMPLETED', 5);
@@ -55,3 +55,14 @@ VALUES
     (NOW(), 1, NULL, NULL, NOW(), 1, 3, 3, 3, 5,  '밥맛이 확실히 달라요. 재구매 예정!'),
     (NOW(), 1, NULL, NULL, NOW(), 1, 4, 4, 4, 2,  '배송이 늦어서 아쉬웠어요.'),
     (NOW(), 1, NULL, NULL, NOW(), 1, 5, 5, 1, 4,  '품질은 좋은데 가격이 살짝 비싸요.');
+
+-- 5. order items (order_id → orders, product_id → products 참조)
+INSERT IGNORE INTO backoffice.order_items
+(order_id, order_price, product_id, quantity, total_amount)
+VALUES
+    (1, 15000, 1, 1, 15000),
+    (2, 25000,2, 3, 75000),
+    (3, 39000, 3, 1, 39000),
+    (4, 8000, 4, 1, 8000),
+    (5, 15000, 1, 1, 15000),
+    (5, 12000,5, 1, 12000);

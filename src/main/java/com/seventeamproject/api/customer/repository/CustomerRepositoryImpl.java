@@ -1,29 +1,39 @@
 package com.seventeamproject.api.customer.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seventeamproject.api.customer.dto.CustomersResponse;
+import com.seventeamproject.api.customer.dto.GetCustomerResponse;
 import com.seventeamproject.api.customer.dto.QCustomersResponse;
-import com.seventeamproject.api.customer.entity.CustomerStatus;
+import com.seventeamproject.api.customer.dto.QGetCustomerResponse;
+import com.seventeamproject.api.customer.enums.CustomerStatus;
 import com.seventeamproject.api.customer.entity.QCustomer;
+import com.seventeamproject.api.order.entity.QOrder;
+import com.seventeamproject.api.order.entity.QOrderItem;
+import com.seventeamproject.api.order.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.seventeamproject.api.customer.entity.QCustomer.customer;
 
-
+@Repository
 @RequiredArgsConstructor
 public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+
+    QCustomer customer = QCustomer.customer;
+    QOrder orderList = QOrder.order;
+    QOrderItem orderItem = QOrderItem.orderItem;
 
     @Override
     public Page<CustomersResponse> search(
@@ -31,9 +41,6 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
             String keyword,
             CustomerStatus stat
     ) {
-        QCustomer customer = QCustomer.customer;
-//        QOrder orderList = QOrder.order;
-
         BooleanBuilder builder = new BooleanBuilder();
 
         if (keyword != null && !keyword.isBlank()) {
@@ -54,54 +61,52 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
                         customer.email,
                         customer.phone,
                         customer.status,
-//                        JPAExpressions
-//                                .select(orderList.count())
-//                                .from(orderList)
-//                                .where(orderList.customer.id.eq(customer.id)),
-//                        JPAExpressions
-//                                .select(orderList.value.sum())
-//                                .from(orderList)
-//                                .where(orderList.customer.id.eq(customer.id)),
+                        totalOrderCountSubQuery,
+                        totalOrderItemCountSubQuery,
+                        totalPaymentSubQuery,
                         customer.createdAt
                 ))
                 .from(customer)
-                .where(builder
-//                        keywordContains(keyword),statusEqual(status)
-                );
+                .where(builder);
 
         for (Sort.Order order : pageable.getSort()) {
             query.orderBy(getOrderSpecifier(order));
         }
 
-        List<CustomersResponse> content = query
+        List<CustomersResponse> contents = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
         Long total = queryFactory
                 .select(customer.count())
                 .from(customer)
-                .where(builder
-//                        keywordContains(keyword),statusEqual(status)
-                )
+                .where(builder)
                 .fetchOne();
 
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(contents, pageable, total);
     }
-//
-//    private BooleanExpression keywordContains(String keyword) {
-//        return keyword != null ?
-//                customer.name.contains(keyword)
-//                        .or(customer.email.contains(keyword)) : null;
-//    }
-//
-//    private BooleanExpression statusEqual(CustomerStatus status){
-//        return status != null ? customer.status.eq(status) : null;
-//    }
+
+    @Override
+    public GetCustomerResponse searchOne(Long id) {
+        GetCustomerResponse result = queryFactory
+                .select(new QGetCustomerResponse(
+                        customer.id,
+                        customer.name,
+                        customer.email,
+                        customer.phone,
+                        customer.status,
+                        totalOrderCountSubQuery,
+                        totalOrderItemCountSubQuery,
+                        totalPaymentSubQuery,
+                        customer.createdAt
+                ))
+                .from(customer)
+                .where(customer.id.eq(id))
+                .fetchOne();
+        return result;
+    }
 
     private OrderSpecifier<?> getOrderSpecifier(Sort.Order order) {
-
-        QCustomer customer = QCustomer.customer;
-
         Order direction = order.isAscending()
                 ? Order.ASC
                 : Order.DESC;
@@ -119,4 +124,37 @@ public class CustomerRepositoryImpl implements CustomerRepositoryCustom {
                 return new OrderSpecifier<>(Order.ASC, customer.createdAt);
         }
     }
+
+    //총 주문 금액 계산
+    Expression<Long> totalPaymentSubQuery =
+            JPAExpressions
+                    .select(orderItem.totalAmount.sum().coalesce(0L))
+                    .from(orderItem)
+                    .join(orderItem.order,orderList)
+                    .where(
+                            orderItem.order.customer.id.eq(customer.id)
+                                    .and(orderList.status.ne(OrderStatus.CANCELED))
+                    );
+
+    // 총 주문 횟수 계산
+    Expression<Long> totalOrderCountSubQuery =
+            JPAExpressions
+                    .select(orderList.count())
+                    .from(orderList)
+                    .where(
+                            orderList.customer.id.eq(customer.id)
+                                    .and(orderList.status.ne(OrderStatus.CANCELED))
+                    );
+
+    // 총 주문한 물품 개수 계산
+    Expression<Long> totalOrderItemCountSubQuery =
+            JPAExpressions
+                    .select(orderItem.quantity.sum().coalesce(0L))
+                    .from(orderItem)
+                    .join(orderItem.order,orderList)
+                    .where(
+                            orderItem.order.customer.id.eq(customer.id)
+                                    .and(orderList.status.ne(OrderStatus.CANCELED))
+                    );
+
 }

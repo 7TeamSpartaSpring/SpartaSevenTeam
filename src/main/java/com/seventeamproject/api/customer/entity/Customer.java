@@ -1,5 +1,6 @@
 package com.seventeamproject.api.customer.entity;
 
+import com.seventeamproject.api.customer.enums.CustomerStatus;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,10 +34,8 @@ public class Customer extends SoftDeletableEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CustomerStatus status = CustomerStatus.PENDING;
+    private CustomerStatus status;
 
-//    private int totalOrderCount;
-//    private Long totalPayment;
 
     public Customer(Long id, String name, String email,String phone,CustomerStatus status) {
         this.id = id;
