@@ -6,7 +6,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seventeamproject.api.customer.entity.QCustomer;
 import com.seventeamproject.api.order.entity.Order;
-import com.seventeamproject.api.order.entity.OrderStatus;
+import com.seventeamproject.api.order.enums.OrderStatus;
 import com.seventeamproject.api.order.entity.QOrder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -98,3 +98,5 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         return specifiers.toArray(new OrderSpecifier[0]);
     }
 }
+
+
