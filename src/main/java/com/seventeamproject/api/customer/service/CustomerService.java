@@ -1,9 +1,7 @@
 package com.seventeamproject.api.customer.service;
 
-import com.seventeamproject.api.customer.dto.CustomerRequest;
-import com.seventeamproject.api.customer.dto.CustomerResponse;
-import com.seventeamproject.api.customer.dto.CustomersResponse;
-import com.seventeamproject.api.customer.entity.CustomerStatus;
+import com.seventeamproject.api.customer.dto.*;
+import com.seventeamproject.api.customer.enums.CustomerStatus;
 import com.seventeamproject.api.customer.repository.CustomerRepository;
 import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.exception.ErrorCode;
@@ -17,13 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class CustomerService {
     private final CustomerRepository customerRepository;
 
     //전체 조회
-    public PageResponse<CustomersResponse> getAll(
-            String keyword, int page, int size,String sortBy, String direction, String stat
+    @Transactional(readOnly = true)
+    public PageResponse<CustomersResponse> search(
+            String keyword, int page, int size, String sortBy, String direction, String stat
     ) {
         Sort sort = createSort(sortBy, direction);
 
@@ -39,21 +38,28 @@ public class CustomerService {
     }
 
     //단건 조회
-    public CustomerResponse getOne(Pageable pageable, Long id) {
-        return new CustomerResponse(
-                customerRepository.findById(id).orElseThrow(
-                        () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
-                )
-        );
+    @Transactional(readOnly = true)
+    public GetCustomerResponse getOne(Long id) {
+//        return new CustomerResponse(
+//                customerRepository.findById(id).orElseThrow(
+//                        () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
+//                )
+//        );
+        GetCustomerResponse response = customerRepository.searchOne(id);
+
+        if(response == null){
+            throw new MemberException(ErrorCode.CUSTOMER_NOT_FOUND);
+        }
+        return response;
     }
 
     //정보 수정
     @Transactional
     public CustomerResponse update(Long id, CustomerRequest request) {
-        if(customerRepository.existsByEmail(request.email())){
+        if(customerRepository.existsByEmailAndIdNot(request.email(), id)){
             throw new MemberException(ErrorCode.DUPLICATE_EMAIL);
         }
-        if(customerRepository.existsByPhone(request.phone())){
+        if(customerRepository.existsByPhoneAndIdNot(request.phone(),id)){
             throw new MemberException(ErrorCode.DUPLICATE_PHONE);
         }
         return new CustomerResponse(customerRepository.findById(id).orElseThrow(
@@ -63,7 +69,7 @@ public class CustomerService {
 
     //상태 수정
     @Transactional
-    public CustomerResponse updateStatus(Long id, CustomerRequest request) {
+    public CustomerResponse updateStatus(Long id, CustomerStatusRequest request) {
         return new CustomerResponse(customerRepository.findById(id).orElseThrow(
                 () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
         ).updateStatus(CustomerStatus.fromStat(request.status())));
