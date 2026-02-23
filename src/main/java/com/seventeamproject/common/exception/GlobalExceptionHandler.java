@@ -93,9 +93,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiResponse<Void>> handleUnauthorizedException(UnauthorizedException e, HttpServletRequest request) {
         log.warn("UnauthorizedException : {}", e.getMessage());
+        ErrorCode errorCode = ErrorCode.STATE_NOT_LOGIN;
         return ResponseEntity
-                .badRequest() // 400 Bad Request
-                .body(ApiResponse.fail(buildErrorResponse(ErrorCode.INVALID_PASSWORD, e.getMessage(), request.getRequestURI())));
+                .status(errorCode.getStatus())
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
     }
 
     /**
