@@ -39,3 +39,6 @@ out/
 # QueryDSL 자동 생성 파일
 build/generated
 src/main/generated
+
+src/main/resources/application.yaml
+build.gradle

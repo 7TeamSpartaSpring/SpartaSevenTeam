@@ -1,4 +1,4 @@
-drop table customers;
+drop table backoffice.customers;
 
 create table backoffice.customers
 (
