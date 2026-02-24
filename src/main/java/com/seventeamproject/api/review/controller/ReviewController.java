@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/v1/reviews")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN', 'CS_ADMIN')")
     public ResponseEntity<ApiResponse> getAll(
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication authentication,
@@ -35,6 +37,7 @@ public class ReviewController {
     }
 
     @GetMapping("/v1/reviews/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN', 'CS_ADMIN')")
     public ResponseEntity<ApiResponse> getOne(
             @PathVariable Long id,
             Authentication authentication
@@ -42,7 +45,9 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(reviewService.getOne(id)));
     }
 
+
     @PutMapping("/v1/reviews/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     public ResponseEntity<ApiResponse> update(
             @PathVariable Long id,
             Authentication authentication,
@@ -52,7 +57,8 @@ public class ReviewController {
     }
 
     @DeleteMapping("/v1/reviews/{id}")
-    public ResponseEntity<Void> delete(
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
+    public ResponseEntity<ApiResponse> delete(
             @PathVariable Long id,
             Authentication authentication
     ) {
@@ -65,15 +71,12 @@ public class ReviewController {
     }
 
     @PutMapping("/v1/reviews/{id}/restore")
-    public ResponseEntity<Void> restore(
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
+    public ResponseEntity<ApiResponse> restore(
             @PathVariable Long id,
             Authentication authentication
     ) {
         reviewService.restore(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 }
-//        PrincipalUser user = (PrincipalUser) authentication.getPrincipal();
-//        log.info(user.getId().toString());
-//        log.info(user.getEmail());

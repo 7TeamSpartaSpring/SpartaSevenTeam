@@ -40,5 +40,5 @@ out/
 build/generated
 src/main/generated
 
-src/main/resources/application.yaml
+*.yaml
 build.gradle

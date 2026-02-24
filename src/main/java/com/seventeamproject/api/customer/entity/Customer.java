@@ -22,19 +22,19 @@ public class Customer extends SoftDeletableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; //고객 고유번호
 
-    private String name;
-
-    @Column(unique = true, nullable = false)
-    private String email;
+    private String name; //고객 이름
 
     @Column(unique = true, nullable = false)
-    private String phone;
+    private String email; //고객 이메일
+
+    @Column(unique = true, nullable = false)
+    private String phone; // 고객 전화번호
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CustomerStatus status;
+    private CustomerStatus status; // 고객 상태
 
 
     public Customer(Long id, String name, String email,String phone,CustomerStatus status) {
@@ -45,6 +45,7 @@ public class Customer extends SoftDeletableEntity {
         this.status = status;
     }
 
+    // 고객 정보 업데이트
     public Customer update(String name, String email, String phone){
         this.name = name;
         this.email = email;
@@ -52,6 +53,7 @@ public class Customer extends SoftDeletableEntity {
         return this;
     }
 
+    // 고객 상태 업데이트
     public Customer updateStatus(CustomerStatus status){
         this.status = status;
         return this;
