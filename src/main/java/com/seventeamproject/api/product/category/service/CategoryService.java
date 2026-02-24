@@ -6,6 +6,8 @@ import com.seventeamproject.api.product.category.dto.CategoryResponse;
 import com.seventeamproject.api.product.category.entity.Category;
 import com.seventeamproject.api.product.category.repository.CategoryRepository;
 import com.seventeamproject.common.dto.PageResponse;
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.ProductException;
 import com.seventeamproject.example.one.dto.OnesResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,6 @@ public class CategoryService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        categoryRepository.findById(id).orElseThrow(() -> new IllegalStateException("삭제 할 카테고리가 없습니다")).delete(userId);
+        categoryRepository.findById(id).orElseThrow(() -> new ProductException(ErrorCode.CATEGORY_NOT_FOUND)).delete(userId);
     }
 }

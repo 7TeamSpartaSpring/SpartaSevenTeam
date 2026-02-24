@@ -5,6 +5,7 @@ import com.seventeamproject.api.product.product.service.ProductService;
 import com.seventeamproject.api.product.sku.dto.ChangeQtyRequest;
 import com.seventeamproject.api.product.sku.service.SkuService;
 import com.seventeamproject.common.dto.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class SkuController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     public ResponseEntity<ApiResponse> changeStatus(Authentication authentication,
                                                     @PathVariable Long skuId,
-                                                    @RequestBody ChangeQtyRequest request) {
+                                                    @Valid @RequestBody ChangeQtyRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(skuService.setQty(skuId, request)));
     }
 }

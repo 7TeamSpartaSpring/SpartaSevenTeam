@@ -37,7 +37,7 @@ public class InventoryService {
     }
 
     public Inventory getInventoryBySkuId(Long id) {
-        return inventoryRepository.findBySkuId(id).orElseThrow(() -> new IllegalStateException());
+        return inventoryRepository.findBySkuId(id).orElseThrow(() -> new ProductException(ErrorCode.STOCK_NOT_FOUND));
     }
 
     @Transactional
