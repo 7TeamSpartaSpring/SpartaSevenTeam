@@ -28,23 +28,20 @@ public class AuthController {
     public ResponseEntity<ApiResponse> adminSignup(
             @Valid @RequestBody SignupRequest request
     ) {
-        SignupResponse result = authService.signup(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(result));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(authService.signup(request)));
     }
 
     // 관리자 로그인
     @PostMapping("/v1/admin/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> adminLogin(
+    public ResponseEntity<ApiResponse> adminLogin(
             @Valid @RequestBody LoginRequest request
     ) {
-        LoginResponse result = authService.login(request);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(result));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(authService.login(request)));
     }
 
     // 로그아웃
     @PostMapping("/v1/admin/logout")
     public ResponseEntity<ApiResponse> logout() {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success("로그아웃 완료"));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("로그아웃 완료"));
     }
 }
