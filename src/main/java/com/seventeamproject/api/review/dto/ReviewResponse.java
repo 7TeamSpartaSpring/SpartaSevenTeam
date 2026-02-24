@@ -7,22 +7,19 @@ import java.time.LocalDateTime;
 
 public record ReviewResponse(
         Long id,
-        Long productId,
-        Long orderId,
-        Long customerId,
-        Long reviewQty,
+        String product,
+        String order,
+        String customer,
         Long rating,
         String content,
         LocalDateTime createdAt) {
 
-    // Entity -> DTO 변환 생성자
     public ReviewResponse (Review review) {
         this(
                 review.getId(),
-                review.getProduct(),   // productId 위치 (Long)
-                review.getOrder(),     // orderId 위치 (Long)
-                review.getCustomer(),  // customerId 위치 (Long)
-                review.getReviewQty(),
+                review.getProduct().getName(),
+                review.getOrder().getOrderNumber(),
+                review.getCustomer().getName(),
                 review.getRating(),
                 review.getContent(),
                 review.getCreatedAt()

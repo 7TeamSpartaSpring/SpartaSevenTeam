@@ -23,10 +23,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
         List<ReviewResponse> content = queryFactory
                 .select(new QReviewResponse(
                         qReview.id,
-                        qReview.product,
-                        qReview.order,
-                        qReview.customer,
-                        qReview.reviewQty,
+                        qReview.product.name,
+                        qReview.order.orderNumber,
+                        qReview.customer.name,
                         qReview.rating,
                         qReview.content,
                         qReview.createdAt
