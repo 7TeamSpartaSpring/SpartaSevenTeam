@@ -2,8 +2,6 @@ package com.seventeamproject.api.product.category.entity;
 
 import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.product.category.enums.CategoryStatusEnum;
-import com.seventeamproject.api.product.product.entity.Product;
-import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

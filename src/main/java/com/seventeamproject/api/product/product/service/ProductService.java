@@ -2,21 +2,19 @@ package com.seventeamproject.api.product.product.service;
 
 import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.product.category.entity.Category;
-import com.seventeamproject.api.product.category.repository.CategoryRepository;
 import com.seventeamproject.api.product.inventory.dto.InventoryRequest;
 import com.seventeamproject.api.product.inventory.service.InventoryService;
 import com.seventeamproject.api.product.product.dto.ProductRequest;
 import com.seventeamproject.api.product.product.dto.ProductResponse;
 import com.seventeamproject.api.product.product.dto.ProductsResponse;
 import com.seventeamproject.api.product.product.entity.Product;
-import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.api.product.product.repository.ProductRepository;
 import com.seventeamproject.api.product.sku.dto.SkuRequest;
 import com.seventeamproject.api.product.sku.entity.Sku;
 import com.seventeamproject.api.product.sku.enums.SkuStatusEnum;
 import com.seventeamproject.api.product.sku.service.SkuService;
 import com.seventeamproject.common.dto.PageResponse;
-import com.seventeamproject.example.one.dto.OnesResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +51,7 @@ public class ProductService {
         return new ProductResponse(product);
     }
 
-    public PageResponse<ProductsResponse> getAll(Pageable pageable, String name, Long categoryId, ProductStatusEnum status) {
+    public PageResponse<ProductsResponse> getAll(Pageable pageable, String name, Long categoryId, ProductStatus status) {
         return new PageResponse<>(productRepository.search(pageable, name, categoryId, status));
     }
 }

@@ -2,7 +2,7 @@ package com.seventeamproject.api.product.product.entity;
 
 import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.product.category.entity.Category;
-import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -29,7 +29,7 @@ public class Product extends SoftDeletableEntity {
     private Long price;
     private Long totalQty;
     @Enumerated(EnumType.STRING)
-    private ProductStatusEnum status;
+    private ProductStatus status;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -38,7 +38,7 @@ public class Product extends SoftDeletableEntity {
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
 
-    public Product(String name, Category category, Long price, Long totalQty, ProductStatusEnum status, Admin admin) {
+    public Product(String name, Category category, Long price, Long totalQty, ProductStatus status, Admin admin) {
         this.name = name;
         this.category = category;
         this.price = price;

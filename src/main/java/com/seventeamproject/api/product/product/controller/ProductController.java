@@ -1,7 +1,7 @@
 package com.seventeamproject.api.product.product.controller;
 
 import com.seventeamproject.api.product.product.dto.ProductRequest;
-import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.api.product.product.service.ProductService;
 import com.seventeamproject.common.dto.ApiResponse;
 import com.seventeamproject.common.security.principal.PrincipalUser;
@@ -34,7 +34,7 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getAll(Authentication authentication,
                                               @RequestParam(required = false) String name,
                                               @RequestParam(required = false) Long categoryId,
-                                              @RequestParam(required = false) ProductStatusEnum status,
+                                              @RequestParam(required = false) ProductStatus status,
                                               @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC)
                                               Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).
