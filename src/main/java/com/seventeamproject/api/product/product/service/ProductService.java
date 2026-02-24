@@ -42,7 +42,7 @@ public class ProductService {
     public boolean canOrder(Long id) {
         Sku sku = skuService.getSku(id);
         if(sku.getStatus() != SkuStatusEnum.AVAILABLE || sku.getProduct().getStatus() != ProductStatus.AVAILABLE){
-            throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
+            throw new ProductException(ErrorCode.ORDER_UNAVAILABLE_STATUS);
         }
         return true;
     }

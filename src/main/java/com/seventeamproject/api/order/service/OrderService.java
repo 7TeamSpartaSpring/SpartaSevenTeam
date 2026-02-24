@@ -114,9 +114,6 @@ public class OrderService {
             Sku sku = item.getSku();
             Long qty = item.getQuantity();
 
-            if(!productService.canOrder(sku.getId())){
-                throw new ProductException(ErrorCode.ORDER_UNAVAILABLE_STATUS);
-            }
             if (productService.adjustStock(sku.getId(), qty) < 0) {
                 throw new ProductException(ErrorCode.ORDER_CANCEL_FAIL);
             }

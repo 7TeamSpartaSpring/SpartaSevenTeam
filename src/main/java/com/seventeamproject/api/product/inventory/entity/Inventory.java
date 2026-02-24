@@ -3,6 +3,7 @@ package com.seventeamproject.api.product.inventory.entity;
 import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.product.category.entity.Category;
 import com.seventeamproject.api.product.product.entity.Product;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.api.product.sku.entity.Sku;
 import com.seventeamproject.api.product.sku.enums.SkuStatusEnum;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
@@ -53,6 +54,23 @@ public class Inventory extends SoftDeletableEntity {
 
     public Long setQty(Long qty) {
         this.qty = qty;
+        if(this.qty > 0){
+            if(product.getStatus() == ProductStatus.SOLD_OUT){
+                product.setStatus(ProductStatus.AVAILABLE);
+            }
+
+            if(sku.getStatus() == SkuStatusEnum.SOLD_OUT){
+                sku.setStatus(SkuStatusEnum.AVAILABLE);
+            }
+
+        }else {
+            if(product.getStatus() != ProductStatus.DISCONTINUED){
+                product.setStatus(ProductStatus.SOLD_OUT);
+            }
+            if(sku.getStatus() != SkuStatusEnum.DISCONTINUED){
+                sku.setStatus(SkuStatusEnum.SOLD_OUT);
+            }
+        }
         return this.qty;
     }
 }

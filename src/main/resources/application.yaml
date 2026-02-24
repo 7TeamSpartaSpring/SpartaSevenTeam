@@ -14,6 +14,7 @@ spring:
       schema-locations: classpath:reset.sql # 테이블 초기화(Drop/Create) 스크립트
       data-locations: classpath:data.sql
 
+
   jpa:
     hibernate:
       ddl-auto: update        # 테이블 자동 생성/업데이트 (실무는 validate, none)
