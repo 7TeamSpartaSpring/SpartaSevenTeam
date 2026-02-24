@@ -4,10 +4,14 @@ import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.product.inventory.dto.InventoryRequest;
 import com.seventeamproject.api.product.inventory.entity.Inventory;
 import com.seventeamproject.api.product.inventory.repository.InventoryRepository;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.api.product.product.repository.ProductRepository;
 import com.seventeamproject.api.product.sku.dto.SkuRequest;
 import com.seventeamproject.api.product.sku.entity.Sku;
+import com.seventeamproject.api.product.sku.enums.SkuStatusEnum;
 import com.seventeamproject.common.dto.PageResponse;
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.ProductException;
 import com.seventeamproject.example.one.dto.OnesResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +26,6 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final EntityManager entityManager;
 
-
-
     @Transactional
     public Inventory save(InventoryRequest request, Long id) {
         return inventoryRepository.save(new Inventory(
@@ -33,7 +35,40 @@ public class InventoryService {
                 request.qty()
         ));
     }
-    public Inventory getInventory(Long id) {
-        return inventoryRepository.findById(id).orElseThrow(() -> new IllegalStateException());
+
+    public Inventory getInventoryBySkuId(Long id) {
+        return inventoryRepository.findBySkuId(id).orElseThrow(() -> new IllegalStateException());
+    }
+
+    @Transactional
+    public Long adjustQty(Sku sku, Long qty) {
+        Inventory inventory = getInventoryBySkuId(sku.getId());
+
+        Long adjustQty = inventory.getQty() + qty;
+        if(adjustQty < 0){
+            throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
+        }else if(adjustQty == 0){
+            if(sku.getStatus() != SkuStatusEnum.DISCONTINUED){
+                sku.setStatus(SkuStatusEnum.SOLD_OUT);
+            }
+            if(sku.getProduct().getStatus() != ProductStatus.DISCONTINUED){
+                sku.getProduct().setStatus(ProductStatus.SOLD_OUT);
+            }
+        }
+        return inventory.setQty(adjustQty);
+    }
+
+    @Transactional
+    public Long setQty(Sku sku, Long qty) {
+        Inventory inventory = getInventoryBySkuId(sku.getId());
+        if(inventory.setQty(qty) == 0){
+            if(sku.getStatus() != SkuStatusEnum.DISCONTINUED){
+                sku.setStatus(SkuStatusEnum.SOLD_OUT);
+            }
+            if(sku.getProduct().getStatus() != ProductStatus.DISCONTINUED){
+                sku.getProduct().setStatus(ProductStatus.SOLD_OUT);
+            }
+        }
+        return inventory.setQty(qty);
     }
 }

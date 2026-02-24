@@ -3,8 +3,8 @@ package com.seventeamproject.api.product.product.service;
 import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.product.category.repository.CategoryRepository;
 import com.seventeamproject.api.product.inventory.dto.InventoryRequest;
-import com.seventeamproject.api.product.inventory.entity.Inventory;
 import com.seventeamproject.api.product.inventory.service.InventoryService;
+import com.seventeamproject.api.product.product.dto.ChangeProductStatusRequest;
 import com.seventeamproject.api.product.product.dto.ProductRequest;
 import com.seventeamproject.api.product.product.dto.ProductResponse;
 import com.seventeamproject.api.product.product.dto.ProductsResponse;
@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,20 +50,7 @@ public class ProductService {
     @Transactional
     public Long adjustStock(Long id, Long qty) {
         Sku sku = skuService.getSku(id);
-        Inventory inventory = inventoryService.getInventory(id);
-
-        Long adjustQty = inventory.getQty() + qty;
-        if(adjustQty < 0){
-            throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
-        }else if(adjustQty == 0 && sku.getStatus() != SkuStatusEnum.DISCONTINUED){
-            if(sku.getStatus() != SkuStatusEnum.DISCONTINUED){
-                sku.setStatus(SkuStatusEnum.SOLD_OUT);
-            }
-            if(sku.getProduct().getStatus() != ProductStatus.DISCONTINUED){
-                sku.getProduct().setStatus(ProductStatus.SOLD_OUT);
-            }
-        }
-        return inventory.setQty(adjustQty);
+        return inventoryService.adjustQty(sku, qty);
     }
 
     @Transactional
@@ -70,12 +59,11 @@ public class ProductService {
                 request.name(),
                 categoryRepository.findById(request.categoryId()).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")),
                 request.price(),
-                request.totalQty(),
                 request.status(),
                 entityManager.getReference(Admin.class, id)
         ));
         Sku sku = skuService.save(new SkuRequest(product, request.price(), SkuStatusEnum.valueOf(request.status().name())), id);
-        inventoryService.save(new InventoryRequest(product, sku, request.totalQty()), id);
+        inventoryService.save(new InventoryRequest(product, sku, 0L), id);
         return new ProductResponse(product);
     }
 
@@ -96,5 +84,20 @@ public class ProductService {
                         categoryRepository.findById(request.categoryId()).
                                 orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")),
                         request.price()));
+    }
+
+    @Transactional
+    public ProductResponse changeStatus(Long id, ChangeProductStatusRequest request) {
+        return new ProductResponse(productRepository.findById(id).
+                orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).setStatus(request.status()));
+    }
+
+    @Transactional
+    public void delete(Long id, Long userId) {
+        skuService.getSkusByProducrtId(id).forEach(sku -> {
+            inventoryService.getInventoryBySkuId(sku.getId()).delete(userId);
+            sku.delete(userId);
+        });
+        productRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).delete(userId);
     }
 }

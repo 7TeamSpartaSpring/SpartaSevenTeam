@@ -28,13 +28,39 @@ VALUES
 
 -- 2. products (admin_id → admin, category_id → categorys 참조)
 INSERT IGNORE INTO backoffice.products
-(admin_id, category_id, created_at, created_by, deleted_at, deleted_by, modified_at, modified_by, price, total_qty, name, status)
+(admin_id, category_id, created_at, created_by, deleted_at, deleted_by, modified_at, modified_by, price, name, status)
 VALUES
-    (1, 1, NOW(), 1, NULL, NULL, NOW(), 1, 15000, 100, '유기농 사과',    'AVAILABLE'),
-    (1, 1, NOW(), 1, NULL, NULL, NOW(), 1, 25000, 50,  '제주 감귤 세트', 'AVAILABLE'),
-    (1, 2, NOW(), 1, NULL, NULL, NOW(), 1, 39000, 200, '국내산 쌀 5kg',  'AVAILABLE'),
-    (1, 2, NOW(), 1, NULL, NULL, NOW(), 1,  8000, 30,  '신선 우유 1L',   'SOLD_OUT'),
-    (1, 3, NOW(), 1, NULL, NULL, NOW(), 1, 12000, 0,   '수입 바나나',    'DISCONTINUED');
+    (1, 1, NOW(), 1, NULL, NULL, NOW(), 1, 15000, '유기농 사과',    'AVAILABLE'),
+    (1, 1, NOW(), 1, NULL, NULL, NOW(), 1, 25000, '제주 감귤 세트', 'AVAILABLE'),
+    (1, 2, NOW(), 1, NULL, NULL, NOW(), 1, 39000, '국내산 쌀 5kg',  'AVAILABLE'),
+    (1, 2, NOW(), 1, NULL, NULL, NOW(), 1,  8000, '신선 우유 1L',   'SOLD_OUT'),
+    (1, 3, NOW(), 1, NULL, NULL, NOW(), 1, 12000, '수입 바나나',    'DISCONTINUED');
+
+-- =============================================
+-- skus 샘플 데이터 (5개)
+-- admin_id → admin(1), product_id → products(1~5) 참조
+-- =============================================
+INSERT IGNORE INTO backoffice.skus
+(admin_id, created_at, created_by, deleted_at, deleted_by, modified_at, modified_by, price, product_id, status)
+VALUES
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 15000, 1, 'AVAILABLE'), -- 유기농 사과 SKU
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 25000, 2, 'AVAILABLE'), -- 제주 감귤 세트 SKU
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 39000, 3, 'AVAILABLE'), -- 국내산 쌀 5kg SKU
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 8000, 4, 'SOLD_OUT'), -- 신선 우유 1L SKU
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 12000, 5, 'DISCONTINUED'); -- 수입 바나나 SKU
+
+-- =============================================
+-- inventorys 샘플 데이터 (5개)
+-- admin_id → admin(1), product_id → products(1~5), sku_id → skus(1~5) 참조
+-- =============================================
+INSERT IGNORE INTO backoffice.inventorys
+(admin_id, created_at, created_by, deleted_at, deleted_by, modified_at, modified_by, product_id, qty, reserved_qty, sku_id)
+VALUES
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 1, 100, 10, 1), -- 유기농 사과: 재고 100, 예약 10
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 2, 50, 5, 2), -- 제주 감귤 세트: 재고 50, 예약 5
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 3, 200, 20, 3), -- 국내산 쌀 5kg: 재고 200, 예약 20
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 4, 0, 0, 4), -- 신선 우유 1L: 재고 0 (품절)
+(1, NOW(), 1, NULL, NULL, NOW(), 1, 5, 0, 0, 5); -- 수입 바나나: 재고 0 (단종)
 
 -- 3. orders (customer_id → customers, registration_admin_id → admin 참조)
 INSERT IGNORE INTO backoffice.orders

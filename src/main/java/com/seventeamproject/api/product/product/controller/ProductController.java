@@ -1,5 +1,6 @@
 package com.seventeamproject.api.product.product.controller;
 
+import com.seventeamproject.api.product.product.dto.ChangeProductStatusRequest;
 import com.seventeamproject.api.product.product.dto.ProductRequest;
 import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.api.product.product.service.ProductService;
@@ -56,5 +57,19 @@ public class ProductController {
                                               @PathVariable Long productId,
                                               @RequestBody ProductRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(productService.update(productId, request)));
+    }
+    @PatchMapping("/v1/products/{productId}/status")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
+    public ResponseEntity<ApiResponse> changeStatus(Authentication authentication,
+                                              @PathVariable Long productId,
+                                              @RequestBody ChangeProductStatusRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(productService.changeStatus(productId, request)));
+    }
+
+    @DeleteMapping("/v1/products/{productId}")
+    public ResponseEntity<Void> delete(Authentication authentication,
+                                       @PathVariable Long productId) {
+        productService.delete(productId, ((PrincipalUser) authentication.getPrincipal()).getId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
