@@ -5,14 +5,14 @@ import jakarta.validation.constraints.Positive;
 
 public record CreateSingleOrderRequest
         (
-                @NotNull (message = "고객ID는 필수입니다.")
-                @Positive (message = "고객ID는 양수여야합니다.")
+                @NotNull (message = "고객ID(customerId)는 필수입니다.")
+                @Positive (message = "고객ID(customerId)는 양수여야합니다.")
                 Long customerId,
-                @NotNull (message = "skuId는 필수입니다.")
-                @Positive (message = "skuID는 양수여야합니다.")
+                @NotNull (message = "skuId(skuId)는 필수입니다.")
+                @Positive (message = "skuID(skuId)는 양수여야합니다.")
                 Long skuId,
-                @NotNull (message = "주문 수량은 필수입니다.")
-                @Positive (message = "주문수량은 양수여야합니다.")
+                @NotNull (message = "주문 수량(quantity)은 필수입니다.")
+                @Positive (message = "주문수량(quantity)은 양수여야합니다.")
                 Long quantity
 
         ){

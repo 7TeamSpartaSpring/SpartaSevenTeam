@@ -32,6 +32,7 @@ public enum ErrorCode {
     ORDER_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "O012", "수량은 1 이상이어야 합니다."),
     ORDER_ITEM_PRICE_INVALID(HttpStatus.BAD_REQUEST, "O013", "주문 가격은 0 이상이어야 합니다."),
     ORDER_ITEM_SKU_REQUIRED(HttpStatus.BAD_REQUEST, "O014", "SKU는 필수입니다."),
+    ORDER_STATUS_BAD_REQUEST(HttpStatus.BAD_REQUEST, "O015", "상태는 준비 -> 배송중 -> 완료 순서로 변경가능합니다"),
 
 
 
