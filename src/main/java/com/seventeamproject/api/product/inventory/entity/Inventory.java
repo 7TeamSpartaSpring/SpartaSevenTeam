@@ -35,9 +35,10 @@ public class Inventory extends SoftDeletableEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sku_id", nullable = false)
     private Sku sku;
+
     private Long qty;
     private Long reserved_qty;
 

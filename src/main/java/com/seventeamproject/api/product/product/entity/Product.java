@@ -28,7 +28,6 @@ public class Product extends SoftDeletableEntity {
 
     private String name;
     private Long price;
-    private Long totalQty;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -39,11 +38,10 @@ public class Product extends SoftDeletableEntity {
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
 
-    public Product(String name, Category category, Long price, Long totalQty, ProductStatus status, Admin admin) {
+    public Product(String name, Category category, Long price, ProductStatus status, Admin admin) {
         this.name = name;
         this.category = category;
         this.price = price;
-        this.totalQty = totalQty;
         this.status = status;
         this.admin = admin;
     }
@@ -55,7 +53,8 @@ public class Product extends SoftDeletableEntity {
         return this;
     }
 
-    public ProductStatus setStatus(ProductStatus status) {
-        return this.status = status;
+    public Product setStatus(ProductStatus status) {
+        this.status = status;
+        return this;
     }
 }
