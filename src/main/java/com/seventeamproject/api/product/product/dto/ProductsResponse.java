@@ -1,7 +1,7 @@
 package com.seventeamproject.api.product.product.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +10,7 @@ public record ProductsResponse(Long id,
                                String category,
                                Long price,
                                Long totalQty,
-                               ProductStatusEnum status,
+                               ProductStatus status,
                                LocalDateTime createdAt,
                                String adminName) {
     @QueryProjection

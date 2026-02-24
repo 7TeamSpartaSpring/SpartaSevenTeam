@@ -1,7 +1,7 @@
 package com.seventeamproject.api.product.product.dto;
 
 import com.seventeamproject.api.product.product.entity.Product;
-import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +10,7 @@ public record ProductResponse(Long id,
                               String categoryName,
                               Long price,
                               Long totalQty,
-                              ProductStatusEnum status,
+                              ProductStatus status,
                               Long createdBy,
                               LocalDateTime createdAt,
                               Long modifiedBy,

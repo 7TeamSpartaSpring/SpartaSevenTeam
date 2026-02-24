@@ -9,7 +9,7 @@ import com.seventeamproject.api.product.inventory.entity.QInventory;
 import com.seventeamproject.api.product.product.dto.ProductsResponse;
 import com.seventeamproject.api.product.product.dto.QProductsResponse;
 import com.seventeamproject.api.product.product.entity.QProduct;
-import com.seventeamproject.api.product.product.enums.ProductStatusEnum;
+import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.common.querydsl.QuerydslUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<ProductsResponse> search(Pageable pageable, String name, Long categoryId, ProductStatusEnum status) {
+    public Page<ProductsResponse> search(Pageable pageable, String name, Long categoryId, ProductStatus status) {
         QProduct product = QProduct.product;
         QCategory category = QCategory.category;
         QAdmin admin = QAdmin.admin;
