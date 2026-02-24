@@ -2,10 +2,12 @@ package com.seventeamproject.api.product.product.controller;
 
 import com.seventeamproject.api.product.product.dto.ChangeProductStatusRequest;
 import com.seventeamproject.api.product.product.dto.ProductRequest;
+import com.seventeamproject.api.product.product.dto.UpdateProductRequest;
 import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.api.product.product.service.ProductService;
 import com.seventeamproject.common.dto.ApiResponse;
 import com.seventeamproject.common.security.principal.PrincipalUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +30,7 @@ public class ProductController {
     @PostMapping("/v1/products")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     public ResponseEntity<ApiResponse> save(Authentication authentication,
-                                            @RequestBody ProductRequest request) {
+                                            @Valid @RequestBody ProductRequest request) {
         PrincipalUser user = (PrincipalUser) authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(ApiResponse.success(productService.save(request, user.getId())));
@@ -45,24 +47,27 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).
                 body(ApiResponse.success(productService.search(pageable, name, categoryId, status)));
     }
+
     @GetMapping("/v1/products/{productId}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN', 'CS_ADMIN')")
     public ResponseEntity<ApiResponse> pick(Authentication authentication,
-                                           @PathVariable Long productId) {
+                                            @PathVariable Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(productService.pick(productId)));
     }
+
     @PutMapping("/v1/products/{productId}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     public ResponseEntity<ApiResponse> update(Authentication authentication,
                                               @PathVariable Long productId,
-                                              @RequestBody ProductRequest request) {
+                                              @Valid @RequestBody UpdateProductRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(productService.update(productId, request)));
     }
+
     @PatchMapping("/v1/products/{productId}/status")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     public ResponseEntity<ApiResponse> changeStatus(Authentication authentication,
-                                              @PathVariable Long productId,
-                                              @RequestBody ChangeProductStatusRequest request) {
+                                                    @PathVariable Long productId,
+                                                    @Valid @RequestBody ChangeProductStatusRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(productService.changeStatus(productId, request)));
     }
 

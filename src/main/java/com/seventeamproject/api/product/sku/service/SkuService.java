@@ -12,6 +12,8 @@ import com.seventeamproject.api.product.sku.dto.SkuRequest;
 import com.seventeamproject.api.product.sku.dto.SkuResponse;
 import com.seventeamproject.api.product.sku.entity.Sku;
 import com.seventeamproject.api.product.sku.repository.SkuRepository;
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.ProductException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,7 @@ public class SkuService {
     }
 
     public Sku getSku(Long id) {
-        return skuRepository.findById(id).orElseThrow(() -> new IllegalStateException());
+        return skuRepository.findById(id).orElseThrow(() -> new ProductException(ErrorCode.SKU_NOT_FOUND));
     }
 
     public List<Sku> getSkusByProducrtId(Long id) {
