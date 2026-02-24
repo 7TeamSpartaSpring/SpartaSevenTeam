@@ -6,21 +6,21 @@ import jakarta.validation.constraints.*;
 // 관리자 회원가입 신청
 public record SignupRequest(
 
-        @NotBlank(message = "이메일은 필수입니다")
-        @Email(message = "이메일 형식이 올바르지 않습니다")
+        @NotBlank(message = "email(이메일)은 필수입니다")
+        @Email(message = "email(이메일)이 올바르지 않습니다")
         String email,
 
-        @NotBlank(message = "비밀번호는 필수입니다")
-        @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다")
+        @NotBlank(message = "password(비밀번호)는 필수입니다")
+        @Size(min = 8, message = "password(비밀번호)는 최소 8자 이상이어야 합니다")
         String password,
 
-        @NotBlank(message = "이름은 필수입니다")
+        @NotBlank(message = "name(이름)은 필수입니다")
         String name,
 
-        @NotBlank(message = "전화번호는 필수입니다")
-        @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "전화번호는 010-xxxx-xxxx 형식이어야 합니다")
+        @NotBlank(message = "phone(전화번호)는 필수입니다")
+        @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "phone(전화번호)는 010-xxxx-xxxx 형식이어야 합니다")
         String phone,
 
-        @NotNull(message = "역할은 필수입니다.")
+        @NotNull(message = "role(역할)은 필수입니다.")
         AdminRoleEnum role
         ) {}
