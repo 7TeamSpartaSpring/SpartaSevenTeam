@@ -44,4 +44,8 @@ public class Sku extends SoftDeletableEntity {
         this.price = price;
         this.status = status;
     }
+
+    public SkuStatusEnum setStatus(SkuStatusEnum status) {
+        return this.status = status;
+    }
 }

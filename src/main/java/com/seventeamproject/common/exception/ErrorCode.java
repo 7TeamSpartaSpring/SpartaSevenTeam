@@ -31,6 +31,7 @@ public enum ErrorCode {
     ORDER_ITEM_PRODUCT_REQUIRED(HttpStatus.BAD_REQUEST, "O011", "상품은 필수입니다."),
     ORDER_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "O012", "수량은 1 이상이어야 합니다."),
     ORDER_ITEM_PRICE_INVALID(HttpStatus.BAD_REQUEST, "O013", "주문 가격은 0 이상이어야 합니다."),
+    ORDER_ITEM_SKU_REQUIRED(HttpStatus.BAD_REQUEST, "O014", "SKU는 필수입니다."),
 
 
 
@@ -62,7 +63,9 @@ public enum ErrorCode {
 
     // [M] CONFLICT - 상태 충돌/규칙 위반 (409)
     INVALID_STATUS_CHANGE(HttpStatus.CONFLICT, "M010", "허용되지 않은 상태 전환입니다."),
-    ORDER_OUT_OF_STOCK(HttpStatus.CONFLICT, "P001", "주문수량이 재고보다 많습니다."),
+    ORDER_OUT_OF_STOCK(HttpStatus.CONFLICT, "P001", "요청수량이 재고보다 많습니다."),
+    ORDER_CANCEL_FAIL(HttpStatus.CONFLICT, "P002", "재고 조정 오류로 주문 취소에 실패 했습니다."),
+    ORDER_UNAVAILABLE_STATUS(HttpStatus.CONFLICT, "P003", "사용 할 수 없는 상태 입니다."),
     ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "O009", "이미 취소된 주문입니다."),
     ORDER_CANCEL_NOT_ALLOWED(HttpStatus.CONFLICT, "O010", "준비중 상태에서만 취소 가능합니다.");
 

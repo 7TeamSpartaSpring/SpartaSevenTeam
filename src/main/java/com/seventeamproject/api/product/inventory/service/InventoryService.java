@@ -33,12 +33,7 @@ public class InventoryService {
                 request.qty()
         ));
     }
-
-    public PageResponse<OnesResponse> getAll(Pageable pageable, String title) {
-//        return new PageResponse<>(productRepository.search(pageable, title));
-        return null;
+    public Inventory getInventory(Long id) {
+        return inventoryRepository.findById(id).orElseThrow(() -> new IllegalStateException());
     }
-
-
-
 }
