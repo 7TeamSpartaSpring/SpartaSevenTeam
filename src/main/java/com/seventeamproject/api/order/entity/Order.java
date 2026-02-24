@@ -111,6 +111,15 @@ public class Order extends SoftDeletableEntity {
         if (status == null) {
             throw new OrderException(ErrorCode.ORDER_STATUS_REQUIRED);
         }
+        if (this.status == OrderStatus.READY && status != OrderStatus.SHIPPING) {
+            throw new OrderException(ErrorCode.ORDER_STATUS_BAD_REQUEST);
+        }
+        if (this.status == OrderStatus.SHIPPING && status != OrderStatus.COMPLETED) {
+            throw new OrderException(ErrorCode.ORDER_STATUS_BAD_REQUEST);
+        }
+        if (this.status == OrderStatus.COMPLETED || status == OrderStatus.CANCELED) {
+            throw new OrderException(ErrorCode.ORDER_UNAVAILABLE_STATUS);
+        }
         this.status = status;
     }
 
