@@ -82,13 +82,25 @@ VALUES
     (NOW(), 1, NULL, NULL, NOW(), 1, 4, 4, 4, 2,  '배송이 늦어서 아쉬웠어요.'),
     (NOW(), 1, NULL, NULL, NOW(), 1, 5, 5, 1, 4,  '품질은 좋은데 가격이 살짝 비싸요.');
 
--- 5. order items (order_id → orders, product_id → products 참조)
+-- =============================================
+-- order_items 샘플 데이터 (5개)
+-- order_id -> orders, product_id -> products, sku_id -> skus 참조
+-- =============================================
 INSERT IGNORE INTO backoffice.order_items
-(order_id, order_price, product_id, quantity, total_amount)
+(created_at, created_by, modified_at, modified_by, order_id, order_price, product_id, quantity, sku_id, total_amount)
 VALUES
-    (1, 15000, 1, 1, 15000),
-    (2, 25000,2, 3, 75000),
-    (3, 39000, 3, 1, 39000),
-    (4, 8000, 4, 1, 8000),
-    (5, 15000, 1, 1, 15000),
-    (5, 12000,5, 1, 12000);
+    -- 1번 주문: 유기농 사과 1개 (ORD-2025-00001)
+    (NOW(), 1, NOW(), 1, 1, 15000, 1, 1, 1, 15000),
+
+    -- 2번 주문: 제주 감귤 세트 3개 (ORD-2025-00002) - 단가 25,000 * 3 = 75,000
+    (NOW(), 1, NOW(), 1, 2, 25000, 2, 3, 2, 75000),
+
+    -- 3번 주문: 국내산 쌀 5kg 1개 (ORD-2025-00003)
+    (NOW(), 1, NOW(), 1, 3, 39000, 3, 1, 3, 39000),
+
+    -- 4번 주문: 신선 우유 1L 1개 (ORD-2025-00004 / 취소됨)
+    (NOW(), 1, NOW(), 1, 4, 8000, 4, 1, 4, 8000),
+
+    -- 5번 주문: 유기농 사과 1개 & 수입 바나나 1개 중 '유기농 사과' 부분 (ORD-2025-00005)
+    -- (참고: 주문 5의 총액이 27,000원이므로 사과 15,000원 + 바나나 12,000원 조합으로 구성)
+    (NOW(), 1, NOW(), 1, 5, 15000, 1, 1, 1, 15000);
