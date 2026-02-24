@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
+// SUPER_ADMIN이 타 관리자 프로필을 수정할 때 사용하는 요청 dto
 public record UpdateAdminRequest(
         @NotBlank(message = "이름은 필수입니다")
         String name,
