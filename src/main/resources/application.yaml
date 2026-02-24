@@ -10,11 +10,9 @@ spring:
 
   sql:
     init:
-      mode: always
-      data-locations:
-        - classpath:customerData.sql
-        - classpath:reviewData.sql
-
+      mode: always # 매번 실행하도록 설정
+      schema-locations: classpath:reset.sql # 테이블 초기화(Drop/Create) 스크립트
+      data-locations: classpath:data.sql
 
   jpa:
     hibernate:
