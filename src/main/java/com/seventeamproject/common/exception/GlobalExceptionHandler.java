@@ -51,9 +51,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalStateException(IllegalStateException e, HttpServletRequest request) {
         log.warn("IllegalStateException : {}", e.getMessage());
+        ErrorCode errorCode = ErrorCode.MEMBER_NOT_FOUND;
         return ResponseEntity
-                .badRequest() // 404 Not Found
-                .body(ApiResponse.fail(buildErrorResponse(ErrorCode.MEMBER_NOT_FOUND, e.getMessage(), request.getRequestURI())));
+                .status(errorCode.getStatus())
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
     }
 
     /**

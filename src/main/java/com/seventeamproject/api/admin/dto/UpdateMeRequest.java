@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
+// 로그인한 관리자(본인)가 내 프로필을 수정할 때 사용하는 요청 dto
 public record UpdateMeRequest (
         @NotBlank(message = "이름은 필수입니다")
         String name,

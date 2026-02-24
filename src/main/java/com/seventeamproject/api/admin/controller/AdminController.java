@@ -1,17 +1,13 @@
 package com.seventeamproject.api.admin.controller;
 
 import com.seventeamproject.api.admin.dto.*;
-import com.seventeamproject.api.admin.enums.AdminRoleEnum;
-import com.seventeamproject.api.admin.enums.AdminStatusEnum;
 import com.seventeamproject.api.admin.service.AdminService;
 import com.seventeamproject.common.dto.ApiResponse;
 import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.security.principal.PrincipalUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +23,7 @@ public class AdminController {
 
     // 관리자 내 프로필 조회
     @GetMapping("/v1/admin/me")
-    public ResponseEntity<ApiResponse> me(Authentication authentication) {
+    public ResponseEntity<ApiResponse<AdminResponse>> me(Authentication authentication) {
         PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(adminService.getMe(principal.getId())));
@@ -35,7 +31,7 @@ public class AdminController {
 
     // 관리자 내 프로필 수정
     @PutMapping ("/v1/admin/me")
-    public ResponseEntity<ApiResponse> updateMe(
+    public ResponseEntity<ApiResponse<AdminResponse>> updateMe(
             Authentication authentication,
             @Valid @RequestBody UpdateMeRequest request
     ) {
@@ -59,7 +55,7 @@ public class AdminController {
     // 관리자 승인 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/v1/admin/{adminId}/approve")
-    public ResponseEntity<ApiResponse> approve(@PathVariable Long adminId) {
+    public ResponseEntity<ApiResponse<String>> approve(@PathVariable Long adminId) {
         adminService.approve(adminId);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("승인 완료"));
     }
@@ -79,26 +75,10 @@ public class AdminController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/v1/admin")
     public ResponseEntity<ApiResponse<PageResponse<AdminResponse>>> getAdmin(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false)AdminRoleEnum role,
-            @RequestParam(required = false)AdminStatusEnum status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortOrder
+            Pageable pageable,
+            @ModelAttribute AdminSearchRequest request
     ) {
-        if (page < 1) throw new IllegalArgumentException("page는 1 이상이어야 합니다");
-        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다");
-
-        Sort.Direction direction;
-        try {
-            direction = Sort.Direction.fromString(sortOrder);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("");
-        }
-
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
-        PageResponse<AdminResponse> result = adminService.getAdmin(pageable, keyword, role, status);
+        PageResponse<AdminResponse> result = adminService.getAdmin(pageable, request);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(result));
     }
 
@@ -126,7 +106,7 @@ public class AdminController {
 
     // 관리자 관리용 - 관리자 상태 변경 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    @PutMapping("/v1/admin/{adminId}/status")
+    @PatchMapping("/v1/admin/{adminId}/status")
     public ResponseEntity<ApiResponse<String>> changeStatus(
             @PathVariable Long adminId,
             @Valid @RequestBody ChangeStatusRequest request
