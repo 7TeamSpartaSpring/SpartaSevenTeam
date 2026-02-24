@@ -43,17 +43,9 @@ public class InventoryService {
     @Transactional
     public Long adjustQty(Sku sku, Long qty) {
         Inventory inventory = getInventoryBySkuId(sku.getId());
-
         Long adjustQty = inventory.getQty() + qty;
         if(adjustQty < 0){
             throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
-        }else if(adjustQty == 0){
-            if(sku.getStatus() != SkuStatusEnum.DISCONTINUED){
-                sku.setStatus(SkuStatusEnum.SOLD_OUT);
-            }
-            if(sku.getProduct().getStatus() != ProductStatus.DISCONTINUED){
-                sku.getProduct().setStatus(ProductStatus.SOLD_OUT);
-            }
         }
         return inventory.setQty(adjustQty);
     }
@@ -61,14 +53,6 @@ public class InventoryService {
     @Transactional
     public Long setQty(Sku sku, Long qty) {
         Inventory inventory = getInventoryBySkuId(sku.getId());
-        if(inventory.setQty(qty) == 0){
-            if(sku.getStatus() != SkuStatusEnum.DISCONTINUED){
-                sku.setStatus(SkuStatusEnum.SOLD_OUT);
-            }
-            if(sku.getProduct().getStatus() != ProductStatus.DISCONTINUED){
-                sku.getProduct().setStatus(ProductStatus.SOLD_OUT);
-            }
-        }
         return inventory.setQty(qty);
     }
 }
