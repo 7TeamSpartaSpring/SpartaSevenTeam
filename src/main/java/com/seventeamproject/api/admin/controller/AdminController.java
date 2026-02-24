@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.web.server.ServerWebExchangeExtensionsKt.principal;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin")
@@ -23,30 +25,30 @@ public class AdminController {
 
     // 관리자 내 프로필 조회
     @GetMapping("/v1/admin/me")
-    public ResponseEntity<ApiResponse<AdminResponse>> me(Authentication authentication) {
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+    public ResponseEntity<ApiResponse> me(Authentication authentication) {
+        PrincipalUser principal = principal(authentication);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(adminService.getMe(principal.getId())));
     }
 
     // 관리자 내 프로필 수정
-    @PutMapping ("/v1/admin/me")
-    public ResponseEntity<ApiResponse<AdminResponse>> updateMe(
+    @PutMapping("/v1/admin/me")
+    public ResponseEntity<ApiResponse> updateMe(
             Authentication authentication,
             @Valid @RequestBody UpdateMeRequest request
     ) {
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        PrincipalUser principal = principal(authentication);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(adminService.updateMe(principal.getId(), request)));
     }
 
     // 관리자 내 비밀번호 변경
     @PatchMapping("/v1/admin/me/password")
-    public ResponseEntity<ApiResponse<String>> changePassword(
+    public ResponseEntity<ApiResponse> changePassword(
             Authentication authentication,
             @Valid @RequestBody ChangePasswordRequest request
     ) {
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        PrincipalUser principal = principal(authentication);
 
         adminService.changePassword(principal.getId(), request);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("비밀번호 변경 완료"));
@@ -55,7 +57,7 @@ public class AdminController {
     // 관리자 승인 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/v1/admin/{adminId}/approve")
-    public ResponseEntity<ApiResponse<String>> approve(@PathVariable Long adminId) {
+    public ResponseEntity<ApiResponse> approve(@PathVariable Long adminId) {
         adminService.approve(adminId);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("승인 완료"));
     }
@@ -63,7 +65,7 @@ public class AdminController {
     // 관리자 거부 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/v1/admin/{adminId}/reject")
-    public ResponseEntity<ApiResponse<String>> reject(
+    public ResponseEntity<ApiResponse> reject(
             @PathVariable Long adminId,
             @Valid @RequestBody RejectRequest request
     ) {
@@ -74,7 +76,7 @@ public class AdminController {
     // 관리자 관리용 - 관리자 목록 조회 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/v1/admin")
-    public ResponseEntity<ApiResponse<PageResponse<AdminResponse>>> getAdmin(
+    public ResponseEntity<ApiResponse> getAdmin(
             Pageable pageable,
             @ModelAttribute AdminSearchRequest request
     ) {
@@ -85,7 +87,7 @@ public class AdminController {
     // 관리자 관리용 - 관리자 목록 상세 조회 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/v1/admin/{adminId}")
-    public ResponseEntity<ApiResponse<AdminResponse>> getAdminDetail(
+    public ResponseEntity<ApiResponse> getAdminDetail(
             @PathVariable Long adminId
     ) {
         AdminResponse result = adminService.getAdminDetail(adminId);
@@ -95,19 +97,18 @@ public class AdminController {
     // 관리자 관리용 - 관리자 정보 수정 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PutMapping("/v1/admin/{adminId}")
-    public ResponseEntity<ApiResponse<AdminResponse>> updateAdmin(
+    public ResponseEntity<ApiResponse> updateAdmin(
             @PathVariable Long adminId,
             @Valid @RequestBody UpdateAdminRequest request
     ) {
         AdminResponse result = adminService.updateAdmin(adminId, request);
-
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(result));
     }
 
     // 관리자 관리용 - 관리자 상태 변경 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/v1/admin/{adminId}/status")
-    public ResponseEntity<ApiResponse<String>> changeStatus(
+    public ResponseEntity<ApiResponse> changeStatus(
             @PathVariable Long adminId,
             @Valid @RequestBody ChangeStatusRequest request
     ) {
@@ -118,12 +119,12 @@ public class AdminController {
     // 관리자 관리용 - 관리자 역할 변경 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/v1/admin/{adminId}/role")
-    public ResponseEntity<ApiResponse<String>> changeRole(
+    public ResponseEntity<ApiResponse> changeRole(
             Authentication authentication,
             @PathVariable Long adminId,
             @Valid @RequestBody ChangeRoleRequest request
     ) {
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        PrincipalUser principal = principal(authentication);
         adminService.changeRole(principal.getId(), adminId, request.role());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success("역할 변경 완료"));
@@ -132,13 +133,16 @@ public class AdminController {
     // 관리자 관리용 - 관리자 삭제 (SUPER_ADMIN만 가능)
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @DeleteMapping("/v1/admin/{adminId}")
-    public ResponseEntity<ApiResponse<String>> deleteAdmin(
+    public ResponseEntity<ApiResponse> deleteAdmin(
             Authentication authentication,
             @PathVariable Long adminId
     ) {
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        PrincipalUser principal = principal(authentication);
         adminService.deleteAdmin(principal.getId(), adminId);
-
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("삭제 완료"));
+    }
+
+    private PrincipalUser principal(Authentication authentication) {
+        return (PrincipalUser) authentication.getPrincipal();
     }
 }
