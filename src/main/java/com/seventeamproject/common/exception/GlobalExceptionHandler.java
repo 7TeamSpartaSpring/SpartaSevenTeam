@@ -25,6 +25,34 @@ public class GlobalExceptionHandler {
      * 비즈니스 로직 실행 중 발생하는 MemberException을 처리합니다.
      * 예: 중복된 이메일 가입 시도 등
      */
+    @ExceptionHandler(OrderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleOrderException(OrderException e, HttpServletRequest request) {
+        log.warn("OrderException : {}", e.getMessage()); // 서버 로그에 에러 기록
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus()) // ErrorCode에 정의된 HTTP 상태 코드 사용
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
+    }
+
+    @ExceptionHandler(CustomerException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCustomerException(CustomerException e, HttpServletRequest request) {
+        log.warn("CustomerException : {}", e.getMessage()); // 서버 로그에 에러 기록
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus()) // ErrorCode에 정의된 HTTP 상태 코드 사용
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
+    }
+
+
+    @ExceptionHandler(ProductException.class)
+    public ResponseEntity<ApiResponse<Void>> handleProductException(ProductException e, HttpServletRequest request) {
+        log.warn("ProductException : {}", e.getMessage()); // 서버 로그에 에러 기록
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus()) // ErrorCode에 정의된 HTTP 상태 코드 사용
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
+    }
+
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<ApiResponse<Void>> handleMemberException(MemberException e, HttpServletRequest request) {
         log.warn("MemberException : {}", e.getMessage()); // 서버 로그에 에러 기록
