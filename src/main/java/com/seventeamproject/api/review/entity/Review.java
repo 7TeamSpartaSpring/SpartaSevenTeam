@@ -1,5 +1,8 @@
 package com.seventeamproject.api.review.entity;
 
+import com.seventeamproject.api.customer.entity.Customer;
+import com.seventeamproject.api.order.entity.Order;
+import com.seventeamproject.api.product.product.entity.Product;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,30 +26,26 @@ public class Review extends SoftDeletableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "product_id", nullable = false)
-    private Long product;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "order_id", nullable = false)
-    @Column(name = "order_id")
-    private Long order;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "customer_id", nullable = false)
-    private Long customer;
-
-    private Long reviewQty;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
     @Column(nullable = false)
     private Long rating;
     @Column(nullable = false, length = 100)
     private String content;
 
-    public Review(Long product, Long order,  Long customer, Long reviewQty, Long rating, String content) {
+    public Review(Product product, Order order,  Customer customer, Long rating, String content) {
         this.product = product;
         this.order = order;
         this.customer = customer;
-        this.reviewQty = reviewQty;
         this.rating = rating;
         this.content = content;
     }
