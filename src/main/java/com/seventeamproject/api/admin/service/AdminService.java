@@ -1,9 +1,6 @@
 package com.seventeamproject.api.admin.service;
 
-import com.seventeamproject.api.admin.dto.AdminResponse;
-import com.seventeamproject.api.admin.dto.ChangePasswordRequest;
-import com.seventeamproject.api.admin.dto.UpdateAdminRequest;
-import com.seventeamproject.api.admin.dto.UpdateMeRequest;
+import com.seventeamproject.api.admin.dto.*;
 import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.admin.enums.AdminRoleEnum;
 import com.seventeamproject.api.admin.enums.AdminStatusEnum;
@@ -13,10 +10,16 @@ import com.seventeamproject.common.exception.ErrorCode;
 import com.seventeamproject.common.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.springframework.data.jpa.repository.query.KeysetScrollSpecification.createSort;
 
 @Slf4j
 @Service
@@ -68,11 +71,10 @@ public class AdminService {
     public void approve(Long adminId) {
         Admin admin = getAdminOrThrow(adminId);
 
-        try {
-            admin.approve();
-        } catch (IllegalStateException e) {
+        if (admin.getStatus() != AdminStatusEnum.PENDING) {
             throw new MemberException(ErrorCode.INVALID_STATUS_CHANGE);
         }
+        admin.approve();
     }
 
     // 거부 (PENDING -> REJECTED)
@@ -80,16 +82,17 @@ public class AdminService {
     public void reject(Long adminId, String reason) {
         Admin admin = getAdminOrThrow(adminId);
 
-        try {
-            admin.reject(reason);
-        } catch (IllegalStateException e) {
+        if (admin.getStatus() != AdminStatusEnum.PENDING) {
             throw new MemberException(ErrorCode.INVALID_STATUS_CHANGE);
         }
+        admin.reject(reason);
     }
 
-    // 관리자 관리 목록 조회
-    public PageResponse<AdminResponse> getAdmin(Pageable pageable, String keyword, AdminRoleEnum role, AdminStatusEnum status) {
-        return new PageResponse<>(adminRepository.search(pageable, keyword, role, status));
+    // 관리자 전체 조회
+    public PageResponse<AdminResponse> getAdmin(Pageable pageable, AdminSearchRequest request) {
+        return new PageResponse<>(
+                adminRepository.search(pageable, request.keyword(), request.role(), request.status())
+        );
     }
 
     // 관리자 상세 조회
@@ -125,11 +128,7 @@ public class AdminService {
             throw new MemberException(ErrorCode.INVALID_INPUT_VALUE);
         }
         Admin admin = getAdminOrThrow(adminId);
-        try {
-            admin.changeStatus(status);
-        } catch (IllegalStateException e) {
-            throw new MemberException(ErrorCode.INVALID_STATUS_CHANGE);
-        }
+        admin.changeStatus(status);
     }
 
     // 관리자 역할 변경
@@ -153,9 +152,12 @@ public class AdminService {
         admin.delete(loginAdminId);
     }
 
+
+    // 공통으로 관리자 조회하고 없으면 예외
     private Admin getAdminOrThrow(Long adminId) {
         return adminRepository.findByIdAndDeletedAtIsNull(adminId).orElseThrow(
                 () -> new MemberException(ErrorCode.ADMIN_NOT_FOUND)
         );
     }
+
 }
