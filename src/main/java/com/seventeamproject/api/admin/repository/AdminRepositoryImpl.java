@@ -24,10 +24,12 @@ public class AdminRepositoryImpl implements AdminRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    // 관리자 목록 검색/필터/정렬/페이징 조회
     @Override
     public Page<AdminResponse> search(Pageable pageable, String keyword, AdminRoleEnum role, AdminStatusEnum status) {
         QAdmin admin = QAdmin.admin;
 
+        // 목록 조회
         List<AdminResponse> content = queryFactory
                 .select(new QAdminResponse(
                         admin.id,
@@ -53,6 +55,7 @@ public class AdminRepositoryImpl implements AdminRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        // 전체 개수 조회
         Long total = queryFactory
                 .select(admin.count())
                 .from(admin)
@@ -66,20 +69,24 @@ public class AdminRepositoryImpl implements AdminRepositoryCustom {
         return new PageImpl<>(content, pageable, total == null ? 0L : total);
     }
 
+    // keyword가 있으면 이름/이메일 contains 검색 조건 생성
     private BooleanExpression keywordContains(String keyword, QAdmin admin) {
         if (keyword == null || keyword.isBlank()) return null;
         return admin.name.containsIgnoreCase(keyword)
                 .or(admin.email.containsIgnoreCase(keyword));
     }
 
+    // role 필터 조건
     private BooleanExpression roleEq(AdminRoleEnum role, QAdmin admin) {
         return role == null ? null : admin.role.eq(role);
     }
 
+    // status 필터 조건
     private BooleanExpression statusEq(AdminStatusEnum status, QAdmin admin) {
         return status == null ? null : admin.status.eq(status);
     }
 
+    // Pageable의 Sort 정보를 Querydsl OrderSpecifier 배열로 변환함
     private OrderSpecifier<?>[] toOrderSpecifiers(Sort sort, QAdmin admin) {
         if (sort == null || sort.isUnsorted()) {
             return new OrderSpecifier<?>[]{admin.createdAt.desc()};
