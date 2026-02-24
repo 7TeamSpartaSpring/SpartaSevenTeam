@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
+
 public class OrderController {
     private final OrderService orderService;
 
     //생성
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
     @PostMapping("/v1/orders")
     public ResponseEntity<ApiResponse<OrderResponse>> save(
             Authentication authentication,
@@ -31,6 +34,7 @@ public class OrderController {
     }
 
     //전체조회
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
     @GetMapping("/v1/orders")
     public ResponseEntity<ApiResponse<PageResponse<OrderListResponse>>> search(
             Pageable pageable,
@@ -42,6 +46,7 @@ public class OrderController {
     }
 
     // 단건조회
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
     @GetMapping("/v1/orders/{orderId}")
     public ResponseEntity<ApiResponse<GetOneOrderResponse>> getOne(
             @PathVariable Long orderId) {
@@ -50,6 +55,7 @@ public class OrderController {
     }
 
     // 상태변경
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION')")
     @PatchMapping("/v1/orders/{orderId}/status")
     public ResponseEntity<ApiResponse<OrderResponse>> update(
             @PathVariable Long orderId,
@@ -59,6 +65,7 @@ public class OrderController {
     }
 
     // 주문취소
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
     @PatchMapping("/v1/orders/{orderId}/cancel")
     public ResponseEntity<ApiResponse<OrderResponse>> cancel(
             @PathVariable Long orderId,
