@@ -4,6 +4,6 @@ import com.seventeamproject.api.admin.enums.AdminRoleEnum;
 import jakarta.validation.constraints.NotNull;
 
 public record ChangeRoleRequest(
-        @NotNull(message = "역할은 필수입니다")
+        @NotNull(message = "role(역할)은 필수입니다")
         AdminRoleEnum role
 ) {}
