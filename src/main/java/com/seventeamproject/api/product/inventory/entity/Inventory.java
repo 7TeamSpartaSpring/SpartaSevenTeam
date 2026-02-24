@@ -1,6 +1,7 @@
 package com.seventeamproject.api.product.inventory.entity;
 
 import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.product.category.entity.Category;
 import com.seventeamproject.api.product.product.entity.Product;
 import com.seventeamproject.api.product.sku.entity.Sku;
 import com.seventeamproject.api.product.sku.enums.SkuStatusEnum;
@@ -47,5 +48,10 @@ public class Inventory extends SoftDeletableEntity {
         this.admin = admin;
         this.qty = qty;
         this.reserved_qty = 0L;
+    }
+
+    public Long setQty(Long qty) {
+        this.qty = qty;
+        return this.qty;
     }
 }

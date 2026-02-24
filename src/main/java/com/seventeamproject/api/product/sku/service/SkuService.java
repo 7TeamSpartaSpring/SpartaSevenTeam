@@ -25,4 +25,8 @@ public class SkuService {
                 request.status()
         ));
     }
+
+    public Sku getSku(Long id) {
+        return skuRepository.findById(id).orElseThrow(() -> new IllegalStateException());
+    }
 }

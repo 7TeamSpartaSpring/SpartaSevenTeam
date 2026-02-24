@@ -12,6 +12,8 @@ import com.seventeamproject.api.order.repository.OrderRepository;
 import com.seventeamproject.api.product.product.entity.Product;
 import com.seventeamproject.api.product.product.repository.ProductRepository;
 import com.seventeamproject.api.product.product.service.ProductService;
+import com.seventeamproject.api.product.sku.entity.Sku;
+import com.seventeamproject.api.product.sku.repository.SkuRepository;
 import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.exception.*;
 import com.seventeamproject.common.security.principal.PrincipalUser;
@@ -33,7 +35,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductService productService;
     private final CustomerRepository customerRepository;
-    private final ProductRepository productRepository;
+    private final SkuRepository skuRepository;
     private final AdminRepository adminRepository;
 
     // 생성
@@ -51,26 +53,27 @@ public class OrderService {
 
         // 상품확인및 재고확인
         for (OrderItemRequest item : request.items()) {
-            Long productId = item.productId();
+            Long skuId = item.skuId();
             Long qty = item.quantity();
 
-            Product product = productRepository.findById(productId)
+            Sku sku = skuRepository.findById(skuId)
                     .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
-            if (!productService.adjustStock(productId, qty)) {
+            if(!productService.canOrder(sku.getId())){
+                throw new ProductException(ErrorCode.ORDER_UNAVAILABLE_STATUS);
+            }
+            if (productService.adjustStock(sku.getId(), -qty) < 0) {
                 throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
             }
 
-            items.add(OrderItem.of(product, qty, product.getPrice()));
+            items.add(OrderItem.of(sku.getProduct(), sku, qty, sku.getPrice()));
         }
+
         //주문번호 랜덤값지정
         String orderNumber = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         return new OrderResponse(orderRepository.save(Order.create(orderNumber, customer, managerId, items)));
     }
-
-
-
 
     //전체조회
     public PageResponse<OrderListResponse> getAll(Pageable pageable, String keyword, OrderStatus status) {
@@ -105,6 +108,20 @@ public class OrderService {
     @Transactional
     public OrderResponse cancel(Long id, OrderCancelRequest request) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new OrderException(ErrorCode.ORDER_NOT_FOUND));
+
+        // 상품확인및 재고확인
+        for (OrderItem item : order.getItems()) {
+            Sku sku = item.getSku();
+            Long qty = item.getQuantity();
+
+            if(!productService.canOrder(sku.getId())){
+                throw new ProductException(ErrorCode.ORDER_UNAVAILABLE_STATUS);
+            }
+            if (productService.adjustStock(sku.getId(), qty) < 0) {
+                throw new ProductException(ErrorCode.ORDER_CANCEL_FAIL);
+            }
+        }
+
         order.cancel(request.cancellationReason());
         return new OrderResponse(order);
     }

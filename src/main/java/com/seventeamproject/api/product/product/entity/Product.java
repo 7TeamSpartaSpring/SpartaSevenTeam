@@ -3,6 +3,7 @@ package com.seventeamproject.api.product.product.entity;
 import com.seventeamproject.api.admin.entity.Admin;
 import com.seventeamproject.api.product.category.entity.Category;
 import com.seventeamproject.api.product.product.enums.ProductStatus;
+import com.seventeamproject.api.product.sku.enums.SkuStatusEnum;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -52,5 +53,9 @@ public class Product extends SoftDeletableEntity {
         this.category = category;
         this.price = price;
         return this;
+    }
+
+    public ProductStatus setStatus(ProductStatus status) {
+        return this.status = status;
     }
 }
