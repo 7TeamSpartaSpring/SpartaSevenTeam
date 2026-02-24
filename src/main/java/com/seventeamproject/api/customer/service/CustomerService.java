@@ -22,34 +22,22 @@ public class CustomerService {
     //전체 조회
     @Transactional(readOnly = true)
     public PageResponse<CustomersResponse> search(
-            String keyword, int page, int size, String sortBy, String direction, String stat
+            Pageable pageable,
+            CustomerSearchRequest request
     ) {
-        Sort sort = createSort(sortBy, direction);
-
-        Pageable pageable = PageRequest.of(
-                page - 1,   // 1페이지 → 0
-                size,
-                sort
-        );
-
-        CustomerStatus customerStatus =
-                stat != null ? CustomerStatus.fromStat(stat) : null;
-        return new PageResponse<>(customerRepository.search(pageable, keyword, customerStatus));
+        CustomerStatus customerStatus = //비어있지않으면 enum에서 값을 받아옴
+                request.stat() != null ? CustomerStatus.fromStat(request.stat()) : null;
+        return new PageResponse<>(customerRepository.search(pageable, request.keyword(), customerStatus));
     }
 
     //단건 조회
     @Transactional(readOnly = true)
     public GetCustomerResponse getOne(Long id) {
-//        return new CustomerResponse(
-//                customerRepository.findById(id).orElseThrow(
-//                        () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
-//                )
-//        );
         GetCustomerResponse response = customerRepository.searchOne(id);
 
         if(response == null){
             throw new MemberException(ErrorCode.CUSTOMER_NOT_FOUND);
-        }
+        } //고객을 찾았지만 없음
         return response;
     }
 
@@ -58,13 +46,13 @@ public class CustomerService {
     public CustomerResponse update(Long id, CustomerRequest request) {
         if(customerRepository.existsByEmailAndIdNot(request.email(), id)){
             throw new MemberException(ErrorCode.DUPLICATE_EMAIL);
-        }
+        }// 이메일은 같고 id는 다를때
         if(customerRepository.existsByPhoneAndIdNot(request.phone(),id)){
             throw new MemberException(ErrorCode.DUPLICATE_PHONE);
-        }
+        }//전화번호는 같고 id는 다를때
         return new CustomerResponse(customerRepository.findById(id).orElseThrow(
                 () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
-        ).update(request.name(), request.email(), request.phone()));
+        ).update(request.name(), request.email(), request.phone())); //db 업데이트
     }
 
     //상태 수정
@@ -72,7 +60,7 @@ public class CustomerService {
     public CustomerResponse updateStatus(Long id, CustomerStatusRequest request) {
         return new CustomerResponse(customerRepository.findById(id).orElseThrow(
                 () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
-        ).updateStatus(CustomerStatus.fromStat(request.status())));
+        ).updateStatus(CustomerStatus.fromStat(request.status()))); // db 업데이트
     }
 
     //단건삭제
@@ -81,32 +69,5 @@ public class CustomerService {
         customerRepository.findById(customerId).orElseThrow(
                 () -> new MemberException(ErrorCode.CUSTOMER_NOT_FOUND)
         ).delete(userId);
-    }
-
-
-    // 전체 조회 pageable변환용 화이트 리스트
-    private Sort createSort(String sortBy, String direction) {
-        String property;
-
-        switch (sortBy) {
-            case "name":
-                property = "name";
-                break;
-            case "email":
-                property = "email";
-                break;
-            case "phone":
-                property = "phone";
-                break;
-            case "createdAt":
-                property = "createdAt";
-                break;
-            default:
-                property = "createdAt"; // 기본값
-        }
-
-        return direction.equalsIgnoreCase("asc")
-                ? Sort.by(property).ascending()
-                : Sort.by(property).descending();
     }
 }

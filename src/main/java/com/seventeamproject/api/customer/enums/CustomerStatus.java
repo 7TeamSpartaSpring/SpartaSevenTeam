@@ -15,6 +15,7 @@ public enum CustomerStatus {
 
     private final String title;
 
+    //String으로 입력받은 값을 enum과 비교해서 일치하는 enum을 반환
     public static CustomerStatus fromStat(String stat){
         for(CustomerStatus status : values()){
             if(stat.equals(String.valueOf(status))){
