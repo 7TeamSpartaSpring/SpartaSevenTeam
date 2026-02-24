@@ -3,6 +3,8 @@ package com.seventeamproject.api.order.entity;
 import com.seventeamproject.api.customer.entity.Customer;
 import com.seventeamproject.api.order.enums.OrderStatus;
 import com.seventeamproject.common.entity.SoftDeletableEntity;
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.OrderException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +15,6 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Entity
@@ -60,16 +61,16 @@ public class Order extends SoftDeletableEntity {
     public static Order create(String orderNumber, Customer customer, Long registrationManagerId, List<OrderItem> items) {
        //validate
         if (orderNumber == null || orderNumber.isBlank()) {
-            throw new IllegalArgumentException("주문번호는 필수입니다.");
+            throw new OrderException(ErrorCode.ORDER_NUMBER_REQUIRED);
         }
         if (customer == null) {
-            throw new IllegalArgumentException("고객은 필수입니다.");
+            throw new OrderException(ErrorCode.ORDER_CUSTOMER_REQUIRED);
         }
         if (registrationManagerId == null) {
-            throw new IllegalArgumentException("담당자 ID는 필수입니다.");
+            throw new OrderException(ErrorCode.ORDER_MANAGER_REQUIRED);
         }
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("주문 항목은 최소 1개 필요합니다.");
+            throw new OrderException(ErrorCode.ORDER_ITEMS_REQUIRED);
         }
 
         Order order = new Order();
@@ -88,7 +89,9 @@ public class Order extends SoftDeletableEntity {
 
     // 주문상품 담는로직
     public void addItem(OrderItem item) {
-        Objects.requireNonNull(item, "주문 항목은 필수입니다.");
+        if (item == null) {
+            throw new OrderException(ErrorCode.ORDER_ITEM_REQUIRED);
+        }
         items.add(item);
         item.setOrder(this);
     }
@@ -105,19 +108,22 @@ public class Order extends SoftDeletableEntity {
 
     // 주문상태변경
     public void updateStatus(OrderStatus status) {
-        this.status = Objects.requireNonNull(status, "주문 상태는 필수입니다.");
+        if (status == null) {
+            throw new OrderException(ErrorCode.ORDER_STATUS_REQUIRED);
+        }
+        this.status = status;
     }
 
     //주문취소
     public void cancel(String cancelReason) {
         if (this.status == OrderStatus.CANCELED) {
-            throw new IllegalStateException("이미 취소된 요청");
+            throw new OrderException(ErrorCode.ORDER_ALREADY_CANCELED);
         }
         if (this.status != OrderStatus.READY) {
-            throw new IllegalStateException("준비중 상태에서만 취소 가능합니다.");
+            throw new OrderException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
         if (cancelReason == null || cancelReason.isBlank()) {
-            throw new IllegalArgumentException("취소 사유는 필수입니다.");
+            throw new OrderException(ErrorCode.ORDER_CANCEL_REASON_REQUIRED);
         }
         this.status = OrderStatus.CANCELED;
         this.cancellationReason = cancelReason;

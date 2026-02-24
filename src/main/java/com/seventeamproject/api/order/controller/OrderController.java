@@ -32,7 +32,7 @@ public class OrderController {
 
     //전체조회
     @GetMapping("/v1/orders")
-    public ResponseEntity<ApiResponse<PageResponse<OrderListResponse>>> getAll(
+    public ResponseEntity<ApiResponse<PageResponse<OrderListResponse>>> search(
             Pageable pageable,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) OrderStatus status
@@ -43,7 +43,7 @@ public class OrderController {
 
     // 단건조회
     @GetMapping("/v1/orders/{orderId}")
-    public ResponseEntity<ApiResponse<GetOneOrderResponse>> get(
+    public ResponseEntity<ApiResponse<GetOneOrderResponse>> getOne(
             @PathVariable Long orderId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(orderService.getOne(orderId)));

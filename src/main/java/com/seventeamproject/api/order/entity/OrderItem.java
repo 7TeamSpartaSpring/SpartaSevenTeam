@@ -1,6 +1,9 @@
 package com.seventeamproject.api.order.entity;
 
 import com.seventeamproject.api.product.product.entity.Product;
+import com.seventeamproject.common.entity.BaseEntity;
+import com.seventeamproject.common.exception.ErrorCode;
+import com.seventeamproject.common.exception.OrderException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "order_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderItem {
+public class OrderItem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,13 +39,13 @@ public class OrderItem {
 
     public static OrderItem of(Product product, Long quantity, Long orderPrice) {
         if (product == null) {
-            throw new IllegalArgumentException("상품은 필수입니다.");
+            throw new OrderException(ErrorCode.ORDER_ITEM_PRODUCT_REQUIRED);
         }
         if (quantity == null || quantity < 1) {
-            throw new IllegalArgumentException("수량은 1 이상이어야 합니다.");
+            throw new OrderException(ErrorCode.ORDER_ITEM_QUANTITY_INVALID);
         }
         if (orderPrice == null || orderPrice < 0) {
-            throw new IllegalArgumentException("주문 가격은 0 이상이어야 합니다.");
+            throw new OrderException(ErrorCode.ORDER_ITEM_PRICE_INVALID);
         }
 
         OrderItem item = new OrderItem();
