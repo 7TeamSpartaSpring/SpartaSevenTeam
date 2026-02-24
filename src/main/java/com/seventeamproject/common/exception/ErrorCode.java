@@ -21,12 +21,26 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "M001", "이미 존재하는 이메일입니다."),
     DUPLICATE_USERNAME(HttpStatus.BAD_REQUEST, "M002", "이미 존재하는 사용자 이름입니다."),
     DUPLICATE_PHONE(HttpStatus.BAD_REQUEST, "M003", "이미 존재하는 전화번호입니다."),
+    ORDER_NUMBER_REQUIRED(HttpStatus.BAD_REQUEST, "O002", "주문번호는 필수입니다."),
+    ORDER_CUSTOMER_REQUIRED(HttpStatus.BAD_REQUEST, "O003", "고객은 필수입니다."),
+    ORDER_MANAGER_REQUIRED(HttpStatus.BAD_REQUEST, "O004", "담당자 ID는 필수입니다."),
+    ORDER_ITEMS_REQUIRED(HttpStatus.BAD_REQUEST, "O005", "주문 항목은 최소 1개 필요합니다."),
+    ORDER_ITEM_REQUIRED(HttpStatus.BAD_REQUEST, "O006", "주문 항목은 필수입니다."),
+    ORDER_STATUS_REQUIRED(HttpStatus.BAD_REQUEST, "O007", "주문 상태는 필수입니다."),
+    ORDER_CANCEL_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "O008", "취소 사유는 필수입니다."),
+    ORDER_ITEM_PRODUCT_REQUIRED(HttpStatus.BAD_REQUEST, "O011", "상품은 필수입니다."),
+    ORDER_ITEM_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "O012", "수량은 1 이상이어야 합니다."),
+    ORDER_ITEM_PRICE_INVALID(HttpStatus.BAD_REQUEST, "O013", "주문 가격은 0 이상이어야 합니다."),
+
+
 
     // [M] NOT_FOUND - 리소스를 찾을 수 없음 (404)
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M004", "회원을 찾을 수 없습니다."),
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND,"M006", "해당하는 고객을 찾을 수 없습니다."),
     STATUS_NOT_FOUND(HttpStatus.NOT_FOUND,"M007","해당하는 상태 값을 찾을 수 없습니다."),
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "M008", "관리자를 찾을 수 없습니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P002", "상품을 찾을 수 없습니다."),
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "주문을 찾을 수 없습니다."),
 
     // [P] AUTH - 인증 (401)
     STATE_NOT_LOGIN(HttpStatus.UNAUTHORIZED, "P008", "로그인되어 있지 않습니다."),
@@ -46,8 +60,10 @@ public enum ErrorCode {
 
 
     // [M] CONFLICT - 상태 충돌/규칙 위반 (409)
-    INVALID_STATUS_CHANGE(HttpStatus.CONFLICT, "M010", "허용되지 않은 상태 전환입니다.");
-
+    INVALID_STATUS_CHANGE(HttpStatus.CONFLICT, "M010", "허용되지 않은 상태 전환입니다."),
+    ORDER_OUT_OF_STOCK(HttpStatus.CONFLICT, "P001", "주문수량이 재고보다 많습니다."),
+    ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "O009", "이미 취소된 주문입니다."),
+    ORDER_CANCEL_NOT_ALLOWED(HttpStatus.CONFLICT, "O010", "준비중 상태에서만 취소 가능합니다.");
 
     private final HttpStatus status; // HTTP 상태 코드 (예: 400, 404, 500)
     private final String code;       // 우리가 정의한 고유 에러 코드 (예: M001)

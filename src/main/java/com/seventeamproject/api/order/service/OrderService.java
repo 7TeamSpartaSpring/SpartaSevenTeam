@@ -13,6 +13,7 @@ import com.seventeamproject.api.product.product.entity.Product;
 import com.seventeamproject.api.product.product.repository.ProductRepository;
 import com.seventeamproject.api.product.product.service.ProductService;
 import com.seventeamproject.common.dto.PageResponse;
+import com.seventeamproject.common.exception.*;
 import com.seventeamproject.common.security.principal.PrincipalUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +45,7 @@ public class OrderService {
 
         // 고객정보가져오기
         Customer customer = customerRepository.findById(request.customerId()).orElseThrow(
-                () -> new RuntimeException("존재하지 않는 고객입니다."));
+                () -> new CustomerException(ErrorCode.CUSTOMER_NOT_FOUND));
 
         List<OrderItem> items = new ArrayList<>();
 
@@ -54,10 +55,10 @@ public class OrderService {
             Long qty = item.quantity();
 
             Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new IllegalArgumentException("상품 없음"));
+                    .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
             if (!productService.adjustStock(productId, qty)) {
-                throw new IllegalStateException("재고 부족");
+                throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
             }
 
             items.add(OrderItem.of(product, qty, product.getPrice()));
@@ -82,12 +83,12 @@ public class OrderService {
     //단건조회
     public GetOneOrderResponse getOne(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 주문"));
+                .orElseThrow(() -> new OrderException(ErrorCode.ORDER_NOT_FOUND));
 
         Admin admin = null;
         if (order.getRegistrationManagerId() != null) {
             admin = adminRepository.findById(order.getRegistrationManagerId())
-                    .orElseThrow(() -> new IllegalStateException("존재하지 않는 관리자"));
+                    .orElseThrow(() -> new MemberException(ErrorCode.ADMIN_NOT_FOUND));
         }
 
         return new GetOneOrderResponse(order, admin);
@@ -96,14 +97,14 @@ public class OrderService {
     //상태변경
     @Transactional
     public OrderResponse update(Long id, StatusUpdateRequest request) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalStateException("존재하지않는 주문ID입니다."));
+        Order order = orderRepository.findById(id).orElseThrow(() -> new OrderException(ErrorCode.ORDER_NOT_FOUND));
                 order.updateStatus(request.orderStatus());
         return new OrderResponse(order);
     }
     //주문취소
     @Transactional
     public OrderResponse cancel(Long id, OrderCancelRequest request) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalStateException("존재하지않는 주문ID입니다."));
+        Order order = orderRepository.findById(id).orElseThrow(() -> new OrderException(ErrorCode.ORDER_NOT_FOUND));
         order.cancel(request.cancellationReason());
         return new OrderResponse(order);
     }
