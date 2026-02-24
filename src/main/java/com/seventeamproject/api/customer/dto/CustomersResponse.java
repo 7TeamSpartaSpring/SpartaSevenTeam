@@ -11,9 +11,9 @@ public record CustomersResponse(
         String email,
         String phone,
         CustomerStatus status,
-        Long totalOrderCount,
-        Long totalOrderItemCount,
-        Long totalPayment,
+        Long totalOrderCount, //총 주문수
+        Long totalOrderItemCount, //총 주문한 물품 수
+        Long totalPayment, //총 구매 금액
         LocalDateTime createdAt
 ) {
     @QueryProjection
