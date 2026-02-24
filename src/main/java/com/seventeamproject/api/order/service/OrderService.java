@@ -9,8 +9,6 @@ import com.seventeamproject.api.order.entity.Order;
 import com.seventeamproject.api.order.entity.OrderItem;
 import com.seventeamproject.api.order.enums.OrderStatus;
 import com.seventeamproject.api.order.repository.OrderRepository;
-import com.seventeamproject.api.product.product.entity.Product;
-import com.seventeamproject.api.product.product.repository.ProductRepository;
 import com.seventeamproject.api.product.product.service.ProductService;
 import com.seventeamproject.api.product.sku.entity.Sku;
 import com.seventeamproject.api.product.sku.repository.SkuRepository;
@@ -65,13 +63,43 @@ public class OrderService {
             if (productService.adjustStock(sku.getId(), -qty) < 0) {
                 throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
             }
-
             items.add(OrderItem.of(sku.getProduct(), sku, qty, sku.getPrice()));
         }
+        //주문번호 랜덤값지정
+        String orderNumber = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        return new OrderResponse(orderRepository.save(Order.create(orderNumber, customer, managerId, items)));
+    }
+
+    // 과제용 1주문1물건 생성
+    @Transactional
+    public OrderResponse saveOne(Authentication authentication, CreateSingleOrderRequest request) {
+        // 담당자정보가져오기
+        PrincipalUser admin = (PrincipalUser) authentication.getPrincipal();
+        Long managerId = admin.getId();
+
+        // 고객정보가져오기
+        Customer customer = customerRepository.findById(request.customerId()).orElseThrow(
+                () -> new CustomerException(ErrorCode.CUSTOMER_NOT_FOUND));
+
+        List<OrderItem> items = new ArrayList<>();
+
+        // 상품확인및 재고확인
+            Long skuId = request.skuId();
+            Long qty = request.quantity();
+
+            Sku sku = skuRepository.findById(skuId)
+                    .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
+
+            if(!productService.canOrder(sku.getId())){
+                throw new ProductException(ErrorCode.ORDER_UNAVAILABLE_STATUS);
+            }
+            if (productService.adjustStock(sku.getId(), -qty) < 0) {
+                throw new ProductException(ErrorCode.ORDER_OUT_OF_STOCK);
+            }
+            items.add(OrderItem.of(sku.getProduct(), sku, qty, sku.getPrice()));
 
         //주문번호 랜덤값지정
         String orderNumber = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-
         return new OrderResponse(orderRepository.save(Order.create(orderNumber, customer, managerId, items)));
     }
 
@@ -82,6 +110,15 @@ public class OrderService {
                         .map(order -> OrderListResponse.from(order, resolveManagerName(order)))
         );
     }
+
+    //과제용 물건1건만보이는 전체조회
+    public PageResponse<OrderNotListResponse> getAllV2(Pageable pageable, String keyword, OrderStatus status) {
+        return new PageResponse<>(
+                orderRepository.search(pageable, keyword, status)
+                        .map(order -> OrderNotListResponse.from(order, resolveManagerName(order)))
+        );
+    }
+
 
     //단건조회
     public GetOneOrderResponse getOne(Long id) {
