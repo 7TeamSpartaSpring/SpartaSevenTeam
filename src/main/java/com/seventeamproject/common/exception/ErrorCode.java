@@ -43,6 +43,9 @@ public enum ErrorCode {
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "M008", "관리자를 찾을 수 없습니다."),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "M009", "리뷰를 찾을 수 없습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P002", "상품을 찾을 수 없습니다."),
+    SKU_NOT_FOUND(HttpStatus.NOT_FOUND, "P005", "SKU를 찾을 수 없습니다."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "P006", "카테고리를 찾을 수 없습니다."),
+    STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "P007", "재고를 찾을 수 없습니다."),
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "주문을 찾을 수 없습니다."),
 
     // [P] AUTH - 인증 (401)
@@ -65,7 +68,7 @@ public enum ErrorCode {
     // [M] CONFLICT - 상태 충돌/규칙 위반 (409)
     INVALID_STATUS_CHANGE(HttpStatus.CONFLICT, "M010", "허용되지 않은 상태 전환입니다."),
     ORDER_OUT_OF_STOCK(HttpStatus.CONFLICT, "P001", "요청수량이 재고보다 많습니다."),
-    ORDER_CANCEL_FAIL(HttpStatus.CONFLICT, "P002", "재고 조정 오류로 주문 취소에 실패 했습니다."),
+    ORDER_CANCEL_FAIL(HttpStatus.CONFLICT, "P004", "재고 조정 오류로 주문 취소에 실패 했습니다."),
     ORDER_UNAVAILABLE_STATUS(HttpStatus.CONFLICT, "P003", "사용 할 수 없는 상태 입니다."),
     ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "O009", "이미 취소된 주문입니다."),
     ORDER_CANCEL_NOT_ALLOWED(HttpStatus.CONFLICT, "O010", "준비중 상태에서만 취소 가능합니다.");

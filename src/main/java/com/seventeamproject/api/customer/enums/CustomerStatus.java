@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CustomerStatus {
-    PENDING("승인대기"),
     ACTIVE("활성"),
     INACTIVE("비활성"),
     SUSPENDED("정지");

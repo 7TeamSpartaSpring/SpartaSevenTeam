@@ -1,13 +1,12 @@
 package com.seventeamproject.api.product.product.service;
 
 import com.seventeamproject.api.admin.entity.Admin;
+import com.seventeamproject.api.product.category.entity.Category;
 import com.seventeamproject.api.product.category.repository.CategoryRepository;
 import com.seventeamproject.api.product.inventory.dto.InventoryRequest;
+import com.seventeamproject.api.product.inventory.entity.Inventory;
 import com.seventeamproject.api.product.inventory.service.InventoryService;
-import com.seventeamproject.api.product.product.dto.ChangeProductStatusRequest;
-import com.seventeamproject.api.product.product.dto.ProductRequest;
-import com.seventeamproject.api.product.product.dto.ProductResponse;
-import com.seventeamproject.api.product.product.dto.ProductsResponse;
+import com.seventeamproject.api.product.product.dto.*;
 import com.seventeamproject.api.product.product.entity.Product;
 import com.seventeamproject.api.product.product.enums.ProductStatus;
 import com.seventeamproject.api.product.product.repository.ProductRepository;
@@ -19,13 +18,11 @@ import com.seventeamproject.api.review.service.ReviewService;
 import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.exception.ErrorCode;
 import com.seventeamproject.common.exception.ProductException;
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManager;;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +38,7 @@ public class ProductService {
 
     public boolean canOrder(Long id) {
         Sku sku = skuService.getSku(id);
-        if(sku.getStatus() != SkuStatusEnum.AVAILABLE || sku.getProduct().getStatus() != ProductStatus.AVAILABLE){
+        if (sku.getStatus() != SkuStatusEnum.AVAILABLE || sku.getProduct().getStatus() != ProductStatus.AVAILABLE) {
             throw new ProductException(ErrorCode.ORDER_UNAVAILABLE_STATUS);
         }
         return true;
@@ -57,14 +54,14 @@ public class ProductService {
     public ProductResponse save(ProductRequest request, Long id) {
         Product product = productRepository.save(new Product(
                 request.name(),
-                categoryRepository.findById(request.categoryId()).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")),
+                categoryRepository.findById(request.categoryId()).orElseThrow(() -> new ProductException(ErrorCode.INVALID_INPUT_VALUE)),
                 request.price(),
                 request.status(),
                 entityManager.getReference(Admin.class, id)
         ));
         Sku sku = skuService.save(new SkuRequest(product, request.price(), SkuStatusEnum.valueOf(request.status().name())), id);
-        inventoryService.save(new InventoryRequest(product, sku, 0L), id);
-        return new ProductResponse(product);
+        Inventory inventory = inventoryService.save(new InventoryRequest(product, sku, request.qty()), id);
+        return new ProductResponse(product, inventory.getQty());
     }
 
     public PageResponse<ProductsResponse> search(Pageable pageable, String name, Long categoryId, ProductStatus status) {
@@ -73,23 +70,28 @@ public class ProductService {
 
     public ProductResponse pick(Long id) {
         return new ProductResponse(productRepository.findById(id).
-                orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")),
+                orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND)),
+                inventoryService.getQtyByProductId(id),
                 reviewService.getReviewSummary(id));
     }
 
     @Transactional
-    public ProductResponse update(Long id, ProductRequest request) {
-        return new ProductResponse(productRepository.findById(id).
-                orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).update(request.name(),
-                        categoryRepository.findById(request.categoryId()).
-                                orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")),
-                        request.price()));
+    public ProductResponse update(Long id, UpdateProductRequest request) {
+        Product product = productRepository.findById(id).
+                orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
+        Category category = categoryRepository.findById(request.categoryId()).
+                orElseThrow(() -> new ProductException(ErrorCode.CATEGORY_NOT_FOUND));
+        return new ProductResponse(product.update(request.name(),
+                category,
+                request.price()),
+                inventoryService.getQtyByProductId(id));
     }
 
     @Transactional
     public ProductResponse changeStatus(Long id, ChangeProductStatusRequest request) {
         return new ProductResponse(productRepository.findById(id).
-                orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).setStatus(request.status()));
+                orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND)).setStatus(request.status()),
+                inventoryService.getQtyByProductId(id));
     }
 
     @Transactional
@@ -98,6 +100,6 @@ public class ProductService {
             inventoryService.getInventoryBySkuId(sku.getId()).delete(userId);
             sku.delete(userId);
         });
-        productRepository.findById(id).orElseThrow(() -> new IllegalStateException("적절한 에러 메세지")).delete(userId);
+        productRepository.findById(id).orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND)).delete(userId);
     }
 }

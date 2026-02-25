@@ -6,6 +6,7 @@ import com.seventeamproject.common.dto.ApiResponse;
 import com.seventeamproject.common.dto.PageResponse;
 import com.seventeamproject.common.security.principal.PrincipalUser;
 import com.seventeamproject.example.one.dto.OnesResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ public class CategoryController {
 
     @PostMapping("/v1/categorys")
     public ResponseEntity<ApiResponse> save(Authentication authentication,
-                                            @RequestBody CategoryRequest request) {
+                                            @Valid @RequestBody CategoryRequest request) {
         PrincipalUser user = (PrincipalUser) authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(categoryService.save(request, user.getId())));
     }
