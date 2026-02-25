@@ -87,11 +87,15 @@ public class DashboardJdbcRepository {
 
     public List<RatingCount> getRatingStats() {
         String sql = """
-            SELECT rating, COUNT(id) AS count
-            FROM reviews
-           WHERE deleted_at IS NULL
-            GROUP BY rating
-            ORDER BY rating
+            SELECT A.rating, COUNT(B.id) AS count
+              FROM (SELECT 1 AS rating
+          UNION ALL SELECT 2
+          UNION ALL SELECT 3
+          UNION ALL SELECT 4
+          UNION ALL SELECT 5 ) A
+         LEFT JOIN reviews B ON A.rating = B.rating AND B.deleted_at IS NULL
+          GROUP BY A.rating
+          ORDER BY A.rating
         """;
 
         return jdbcTemplate.query(sql,
@@ -103,11 +107,13 @@ public class DashboardJdbcRepository {
 
     public List<CustomerStatusCount> getCustomerStatusStats() {
         String sql = """
-            SELECT status, COUNT(id) AS count
-            FROM customers
-           WHERE deleted_at IS NULL
-            GROUP BY status
-            ORDER BY status
+            SELECT A.status, COUNT(B.id) AS count
+              FROM (SELECT 'ACTIVE'  AS status
+          UNION ALL SELECT 'INACTIVE'
+          UNION ALL SELECT 'SUSPENDED') A
+         LEFT JOIN customers B ON A.status = B.status AND B.deleted_at IS NULL
+            GROUP BY A.status
+            ORDER BY A.status
         """;
 
         return jdbcTemplate.query(sql,
@@ -119,12 +125,12 @@ public class DashboardJdbcRepository {
 
     public List<CategoryProductCount> getCategoryProductStats() {
         String sql = """
-            SELECT B.name, COUNT(A.id) AS count
-            FROM products A
-            LEFT JOIN categorys B ON A.category_id = B.id
-           WHERE A.deleted_at IS NULL
-            GROUP BY B.id
-            ORDER BY B.code
+            SELECT A.name, COUNT(B.id) AS count
+            FROM categorys A
+            LEFT JOIN products B ON B.category_id = A.id
+           WHERE B.deleted_at IS NULL
+            GROUP BY A.id
+            ORDER BY A.code
         """;
 
         return jdbcTemplate.query(sql,

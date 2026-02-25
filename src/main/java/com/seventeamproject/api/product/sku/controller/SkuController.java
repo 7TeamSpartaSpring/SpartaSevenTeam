@@ -24,7 +24,7 @@ public class SkuController {
 
     @PatchMapping("/v1/skus/{skuId}/qty")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
-    public ResponseEntity<ApiResponse> changeStatus(Authentication authentication,
+    public ResponseEntity<ApiResponse> setQty(Authentication authentication,
                                                     @PathVariable Long skuId,
                                                     @Valid @RequestBody ChangeQtyRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(skuService.setQty(skuId, request)));

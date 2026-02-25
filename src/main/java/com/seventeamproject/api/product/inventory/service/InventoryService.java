@@ -40,6 +40,10 @@ public class InventoryService {
         return inventoryRepository.findBySkuId(id).orElseThrow(() -> new ProductException(ErrorCode.STOCK_NOT_FOUND));
     }
 
+    public Long getQtyByProductId(Long id) {
+        return inventoryRepository.sumQtyByProductId(id);
+    }
+
     @Transactional
     public Long adjustQty(Sku sku, Long qty) {
         Inventory inventory = getInventoryBySkuId(sku.getId());
