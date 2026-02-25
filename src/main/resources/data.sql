@@ -12,9 +12,9 @@ VALUES
 INSERT IGNORE INTO backoffice.categorys
 (admin_id, created_at, created_by, deleted_at, deleted_by, modified_at, modified_by, code, name, status)
 VALUES
-    (1, NOW(), 1, NULL, NULL, NOW(), 1, 'FRUIT',  '과일',     'ACTIVE'),
-    (1, NOW(), 1, NULL, NULL, NOW(), 1, 'FOOD',   '식품',     'ACTIVE'),
-    (1, NOW(), 1, NULL, NULL, NOW(), 1, 'IMPORT', '수입식품',  'ACTIVE');
+    (1, NOW(), 1, NULL, NULL, NOW(), 1, '003001001',  '과일',     'ACTIVE'),
+    (1, NOW(), 1, NULL, NULL, NOW(), 1, '003002001',   '식품',     'ACTIVE'),
+    (1, NOW(), 1, NULL, NULL, NOW(), 1, '003003001', '수입식품',  'ACTIVE');
 
 -- 1. customers
 INSERT IGNORE INTO backoffice.customers
@@ -22,7 +22,7 @@ INSERT IGNORE INTO backoffice.customers
 VALUES
     (NOW(), NULL, NULL, NULL, NOW(), NULL, 'alice@example.com', '김앨리스', '010-1111-0001', 'ACTIVE'),
     (NOW(), NULL, NULL, NULL, NOW(), NULL, 'bob@example.com',   '이밥',     '010-1111-0002', 'ACTIVE'),
-    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'carol@example.com', '박캐롤',   '010-1111-0003', 'PENDING'),
+    (NOW(), NULL, NULL, NULL, NOW(), NULL, 'carol@example.com', '박캐롤',   '010-1111-0003', 'ACTIVE'),
     (NOW(), NULL, NULL, NULL, NOW(), NULL, 'dave@example.com',  '최데이브', '010-1111-0004', 'SUSPENDED'),
     (NOW(), NULL, NULL, NULL, NOW(), NULL, 'eve@example.com',   '정이브',   '010-1111-0005', 'INACTIVE');
 
