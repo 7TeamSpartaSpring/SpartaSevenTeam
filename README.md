@@ -2209,9 +2209,9 @@ Spring Security 기반 URL 접근 제어
 | Product   | 삭제            | ✅           | ✅               | ✅        |
 | Category  | 생성            | ✅           | ✅               | ❌        |
 | Category  | 삭제            | ✅           | ✅               | ✅        |
-| Order     | 생성            | ✅           | ❌               | ✅        |
-| Order     | 상태 변경         | ✅           | ❌               | ❌        |
-| Order     | 취소            | ✅           | ❌               | ✅        |
+| Order     | 생성            | ✅           | ✅               | ✅        |
+| Order     | 상태 변경         | ✅           | ✅               | ❌        |
+| Order     | 취소            | ✅           | ✅               | ✅        |
 | Review    | 수정/삭제/복구      | ✅           | ✅               | ❌        |
 | Dashboard | 조회            | ✅           | ✅               | ✅        |
 
