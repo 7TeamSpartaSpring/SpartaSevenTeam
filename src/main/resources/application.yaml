@@ -3,14 +3,21 @@ spring:
     name: SevenTeamProject
 
   datasource:
-    url: jdbc:mysql://localhost:3306/test #테이블 명 변경 하기
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME} #테이블 명 변경 하기
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 12345678
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  sql:
+    init:
+      mode: always # 매번 실행하도록 설정
+      schema-locations: classpath:reset.sql # 테이블 초기화(Drop/Create) 스크립트
+      data-locations: classpath:data.sql
+
 
   jpa:
     hibernate:
-      ddl-auto: update         # 테이블 자동 생성/업데이트 (실무는 validate, none)
+      ddl-auto: update        # 테이블 자동 생성/업데이트 (실무는 validate, none)
     show-sql: true             # 실행되는 SQL 로그 보기
     properties:
       hibernate:
@@ -25,5 +32,5 @@ logging:
     root: info
 
 jwt:
-  secret: nG9QhQWm4f8+YkqC2k0R2g6v7JpH9XlV3Wb1TzQ8sYc=
+  secret: ${JWT_KEY}
   access-token-validity: 691200000

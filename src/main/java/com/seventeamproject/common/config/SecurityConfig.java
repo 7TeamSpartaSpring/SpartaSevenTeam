@@ -43,7 +43,7 @@ public class SecurityConfig {
 
                 // URL별 권한 설정 (URL별 인증 인가 설정 위치)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // UsernamePasswordAuthenticationFilter 전에 JWT 필터 생성 삽입

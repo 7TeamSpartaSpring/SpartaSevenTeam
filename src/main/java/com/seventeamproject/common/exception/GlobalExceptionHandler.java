@@ -6,10 +6,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 /**
@@ -25,6 +27,34 @@ public class GlobalExceptionHandler {
      * 비즈니스 로직 실행 중 발생하는 MemberException을 처리합니다.
      * 예: 중복된 이메일 가입 시도 등
      */
+    @ExceptionHandler(OrderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleOrderException(OrderException e, HttpServletRequest request) {
+        log.warn("OrderException : {}", e.getMessage()); // 서버 로그에 에러 기록
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus()) // ErrorCode에 정의된 HTTP 상태 코드 사용
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
+    }
+
+    @ExceptionHandler(CustomerException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCustomerException(CustomerException e, HttpServletRequest request) {
+        log.warn("CustomerException : {}", e.getMessage()); // 서버 로그에 에러 기록
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus()) // ErrorCode에 정의된 HTTP 상태 코드 사용
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
+    }
+
+
+    @ExceptionHandler(ProductException.class)
+    public ResponseEntity<ApiResponse<Void>> handleProductException(ProductException e, HttpServletRequest request) {
+        log.warn("ProductException : {}", e.getMessage()); // 서버 로그에 에러 기록
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus()) // ErrorCode에 정의된 HTTP 상태 코드 사용
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
+    }
+
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<ApiResponse<Void>> handleMemberException(MemberException e, HttpServletRequest request) {
         log.warn("MemberException : {}", e.getMessage()); // 서버 로그에 에러 기록
@@ -51,9 +81,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalStateException(IllegalStateException e, HttpServletRequest request) {
         log.warn("IllegalStateException : {}", e.getMessage());
+        ErrorCode errorCode = ErrorCode.MEMBER_NOT_FOUND;
         return ResponseEntity
-                .badRequest() // 404 Not Found
-                .body(ApiResponse.fail(buildErrorResponse(ErrorCode.MEMBER_NOT_FOUND, e.getMessage(), request.getRequestURI())));
+                .status(errorCode.getStatus())
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
     }
 
     /**
@@ -93,9 +124,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiResponse<Void>> handleUnauthorizedException(UnauthorizedException e, HttpServletRequest request) {
         log.warn("UnauthorizedException : {}", e.getMessage());
+        ErrorCode errorCode = ErrorCode.STATE_NOT_LOGIN;
         return ResponseEntity
-                .badRequest() // 400 Bad Request
-                .body(ApiResponse.fail(buildErrorResponse(ErrorCode.INVALID_PASSWORD, e.getMessage(), request.getRequestURI())));
+                .status(errorCode.getStatus())
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, e.getMessage(), request.getRequestURI())));
+    }
+
+    /**
+     * 403: 권한이 없는 요청(인가 실패) 처리
+     */
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthorizationDeniedException(
+            AuthorizationDeniedException e,
+            HttpServletRequest request
+    ) {
+        log.warn("AuthorizationDeniedException : {}", e.getMessage());
+        ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(ApiResponse.fail(buildErrorResponse(errorCode, errorCode.getMessage(), request.getRequestURI())));
     }
 
     /**
