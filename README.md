@@ -49,20 +49,20 @@
 DB_HOST=
 DB_PORT=
 DB_NAME=
-DB_USERNAME=
+DB_USER=
 DB_PASSWORD=
-JWT_SECRET=
-JWT_EXPIRE_TIME=
+JWT_KEY=
 ```
 
-> JWT_SECRET은 충분히 긴 랜덤 문자열 사용 권장
+> JWT_KEY는 충분히 긴 랜덤 문자열 사용 권장
+> 액세스 토큰 만료시간은 현재 코드에서 `jwt.access-token-validity=691200000`으로 고정되어 있습니다.
 
 ---
 
 ## 3️⃣ DB 생성
 
 ```sql
-CREATE DATABASE seven_team;
+CREATE DATABASE backoffice;
 ```
 
 ---
@@ -130,11 +130,11 @@ http://localhost:8080
 
 | Method | Endpoint | 설명 | 인증 필요 | 권한 |
 |--------|----------|------|------------|------|
-| GET | /api/customer/v1/customers | 고객 목록 조회 (검색/페이징/집계) | ✅ | 전체 |
-| GET | /api/customer/v1/customers/{customerId} | 고객 상세 조회 | ✅ | 전체 |
-| PUT | /api/customer/v1/customers/{customerId} | 고객 정보 수정 | ✅ | 전체 |
-| PATCH | /api/customer/v1/customers/{customerId} | 고객 상태 변경 | ✅ | 전체 |
-| DELETE | /api/customer/v1/customers/{customerId} | 고객 삭제 (Soft Delete) | ✅ | 전체 |
+| GET | /api/customer/v1/customers | 고객 목록 조회 (검색/페이징/집계) | ✅ | SUPER_ADMIN, CS_ADMIN |
+| GET | /api/customer/v1/customers/{customerId} | 고객 상세 조회 | ✅ | SUPER_ADMIN, CS_ADMIN |
+| PUT | /api/customer/v1/customers/{customerId} | 고객 정보 수정 | ✅ | SUPER_ADMIN, CS_ADMIN |
+| PATCH | /api/customer/v1/customers/{customerId} | 고객 상태 변경 | ✅ | SUPER_ADMIN, CS_ADMIN |
+| DELETE | /api/customer/v1/customers/{customerId} | 고객 삭제 (Soft Delete) | ✅ | SUPER_ADMIN |
 
 ---
 
@@ -144,7 +144,7 @@ http://localhost:8080
 |--------|----------|------|------------|------|
 | POST | /api/product/v1/categorys | 카테고리 생성 | ✅ | OPERATION_ADMIN 이상 |
 | GET | /api/product/v1/categorys | 카테고리 목록 조회 | ✅ | 전체 |
-| DELETE | /api/product/v1/categorys/{id} | 카테고리 삭제 (Soft Delete) | ✅ | OPERATION_ADMIN 이상 |
+| DELETE | /api/product/v1/categorys/{id} | 카테고리 삭제 (Soft Delete) | ✅ | 인증 사용자 (메서드 권한 어노테이션 미적용) |
 
 ---
 
@@ -157,7 +157,7 @@ http://localhost:8080
 | GET | /api/product/v1/products/{productId} | 상품 상세 조회 | ✅ | 전체 |
 | PUT | /api/product/v1/products/{productId} | 상품 수정 | ✅ | OPERATION_ADMIN 이상 |
 | PATCH | /api/product/v1/products/{productId}/status | 상품 상태 변경 | ✅ | OPERATION_ADMIN 이상 |
-| DELETE | /api/product/v1/products/{productId} | 상품 삭제 (Soft Delete) | ✅ | OPERATION_ADMIN 이상 |
+| DELETE | /api/product/v1/products/{productId} | 상품 삭제 (Soft Delete) | ✅ | 인증 사용자 (메서드 권한 어노테이션 미적용) |
 
 ---
 
@@ -173,13 +173,13 @@ http://localhost:8080
 
 | Method | Endpoint | 설명 | 인증 필요 | 권한 |
 |--------|----------|------|------------|------|
-| POST | /api/order/v1/orders | 주문 생성 (다품목) | ✅ | CS_ADMIN 이상 |
-| POST | /api/order/v1/orders/single | 주문 생성 (단일상품) | ✅ | CS_ADMIN 이상 |
+| POST | /api/order/v1/orders | 주문 생성 (다품목) | ✅ | SUPER_ADMIN, CS_ADMIN (코드상 `OPERATION` 문자열 불일치) |
+| POST | /api/order/v1/orders/single | 주문 생성 (단일상품) | ✅ | SUPER_ADMIN, CS_ADMIN (코드상 `OPERATION` 문자열 불일치) |
 | GET | /api/order/v1/orders | 주문 목록 조회 (검색/정렬/페이징) | ✅ | 전체 |
 | GET | /api/order/v1/orders/single | 단일상품 주문 목록 조회 | ✅ | 전체 |
 | GET | /api/order/v1/orders/{orderId} | 주문 상세 조회 | ✅ | 전체 |
-| PATCH | /api/order/v1/orders/{orderId}/status | 주문 상태 변경 | ✅ | OPERATION_ADMIN 이상 |
-| PATCH | /api/order/v1/orders/{orderId}/cancel | 주문 취소 | ✅ | CS_ADMIN 이상 |
+| PATCH | /api/order/v1/orders/{orderId}/status | 주문 상태 변경 | ✅ | SUPER_ADMIN (코드상 `OPERATION` 문자열 불일치) |
+| PATCH | /api/order/v1/orders/{orderId}/cancel | 주문 취소 | ✅ | SUPER_ADMIN, CS_ADMIN (코드상 `OPERATION` 문자열 불일치) |
 
 ---
 
@@ -223,12 +223,12 @@ http://localhost:8080
 
 ## CustomerStatus
 - ACTIVE
+- INACTIVE
 - SUSPENDED
-- WITHDRAWN
 
 ## ProductStatus
-- ON_SALE
-- OUT_OF_STOCK
+- AVAILABLE
+- SOLD_OUT
 - DISCONTINUED
 
 ## OrderStatus
@@ -1255,7 +1255,7 @@ Authorization: Bearer {accessToken}
   "categoryId": 1,
   "price": 129000,
   "qty": 50,
-  "status": "ON_SALE"
+  "status": "AVAILABLE"
 }
 ```
 
@@ -1270,7 +1270,7 @@ Authorization: Bearer {accessToken}
     "categoryName": "전자기기",
     "price": 129000,
     "qty": 50,
-    "status": "ON_SALE",
+    "status": "AVAILABLE",
     "adminEmail": "admin@test.com",
     "reviews": null,
     "createdAt": "2026-02-19T10:00:00"
@@ -1324,7 +1324,7 @@ Authorization: Bearer {accessToken}
         "category": "전자기기",
         "price": 129000,
         "totalQty": 50,
-        "status": "ON_SALE",
+        "status": "AVAILABLE",
         "createdAt": "2026-02-19T10:00:00",
         "adminName": "홍길동"
       }
@@ -1371,7 +1371,7 @@ Authorization: Bearer {accessToken}
     "categoryName": "전자기기",
     "price": 129000,
     "qty": 50,
-    "status": "ON_SALE",
+    "status": "AVAILABLE",
     "adminEmail": "admin@test.com",
     "reviews": {
       "averageRating": 4.3,
@@ -1726,7 +1726,7 @@ Authorization: Bearer {accessToken}
 
 ---
 
-## 6-4) 주문 상태 변경 (운영/슈퍼)
+## 6-4) 주문 상태 변경 (슈퍼 / 코드상 `OPERATION` 문자열 포함)
 
 ### Endpoint
 
@@ -2202,19 +2202,20 @@ Spring Security 기반 URL 접근 제어
 | 도메인       | 기능            | SUPER_ADMIN | OPERATION_ADMIN | CS_ADMIN |
 | --------- | ------------- | ----------- | --------------- | -------- |
 | Admin     | 승인/거부/삭제/권한변경 | ✅           | ❌               | ❌        |
-| Customer  | 조회/수정         | ✅           | ✅               | ✅        |
+| Customer  | 조회/수정         | ✅           | ❌               | ✅        |
 | Customer  | 삭제            | ✅           | ❌               | ❌        |
 | Product   | 생성/수정/상태변경    | ✅           | ✅               | ❌        |
-| Product   | 삭제            | ✅           | ✅               | ❌        |
+| Product   | 삭제            | ✅           | ✅               | ✅        |
 | Category  | 생성            | ✅           | ✅               | ❌        |
-| Category  | 삭제            | ✅           | ✅               | ❌        |
+| Category  | 삭제            | ✅           | ✅               | ✅        |
 | Order     | 생성            | ✅           | ❌               | ✅        |
-| Order     | 상태 변경         | ✅           | ✅               | ❌        |
+| Order     | 상태 변경         | ✅           | ❌               | ❌        |
 | Order     | 취소            | ✅           | ❌               | ✅        |
 | Review    | 수정/삭제/복구      | ✅           | ✅               | ❌        |
 | Dashboard | 조회            | ✅           | ✅               | ✅        |
 
 > 실제 코드 기준으로 문서화되었습니다.
+> 주의: Order 도메인은 현재 코드에서 `OPERATION_ADMIN` 대신 `OPERATION` 문자열을 사용합니다.
 
 ---
 
