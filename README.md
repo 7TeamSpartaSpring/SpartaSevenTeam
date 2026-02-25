@@ -1,25 +1,88 @@
+![java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![mySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
+![JSON WEB TOKEN](https://img.shields.io/badge/json%20web%20tokens-323330?style=for-the-badge&logo=json-web-tokens&logoColor=pink)
+<img width="73" height="70" alt="image" src="https://github.com/user-attachments/assets/e296f0a2-3caa-4fbe-aa19-5e5e40bbddec" />
+
+
+---
+
 # 🏢 Sparta Seven Team - E-Commerce BackOffice System
 
-> Spring Boot 기반 관리자 전용 이커머스 백오피스 시스템  
-> JWT + RBAC + QueryDSL + Soft Delete 기반 실무형 설계 팀 프로젝트
+> Spring Boot 기반 관리자 전용 이커머스 백오피스 시스템
+> JWT + RBAC + QueryDSL + Soft Delete + Optimistic Lock 기반 실무형 설계 팀 프로젝트
 
 ---
 
 # 📌 프로젝트 개요
 
-본 프로젝트는 이커머스 서비스의 관리자 전용 백오피스 시스템입니다.
+본 프로젝트는 이커머스 서비스의 **관리자 전용 백오피스 시스템**입니다.
 
-관리자는 다음 도메인을 관리할 수 있습니다.
+단순 CRUD가 아닌, 실제 운영 환경을 고려한 다음 설계 요소를 포함합니다.
 
-- 👤 관리자 관리
-- 🔐 JWT 기반 인증
-- 👥 고객 관리
-- 📦 상품 / SKU / 재고 관리
-- 🛒 주문 관리 (Order + OrderItem 구조)
-- ⭐ 리뷰 관리
-- 📊 통계 대시보드
-- 🔎 검색 / 정렬 / 페이징
-- 🗑 Soft Delete 전략
+* JWT 기반 인증/인가 구조
+* RBAC(Role-Based Access Control)
+* Soft Delete 전략
+* @Version 기반 낙관적 락
+* QueryDSL 동적 검색
+* JDBC 기반 집계 최적화
+* 공통 응답 포맷 통일
+* 전역 예외 처리 구조
+
+---
+
+# 🚀 실행 방법 (Quick Start)
+
+## 1️⃣ 환경 요구사항
+
+* Java 17
+* Gradle
+* MySQL 8.x
+
+---
+
+## 2️⃣ 환경 변수 설정
+
+`application.yml` 또는 환경 변수에 아래 값이 필요합니다.
+
+```yaml
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_USERNAME=
+DB_PASSWORD=
+JWT_SECRET=
+JWT_EXPIRE_TIME=
+```
+
+> JWT_SECRET은 충분히 긴 랜덤 문자열 사용 권장
+
+---
+
+## 3️⃣ DB 생성
+
+```sql
+CREATE DATABASE seven_team;
+```
+
+---
+
+## 4️⃣ 실행
+
+```bash
+./gradlew clean build
+./gradlew bootRun
+```
+
+---
+
+## 5️⃣ 접속
+
+```
+http://localhost:8080
+```
+
+---
 
 본 프로젝트는 단순 CRUD가 아닌 **실무 구조를 반영한 설계 기반 프로젝트**입니다.
 
@@ -2079,19 +2142,29 @@ Authorization: Bearer {accessToken}
 
 </details>
 
-
-# 🏗️ 시스템 아키텍처
+# 🏗 시스템 아키텍처
 
 ## 3-Layer Architecture
 
-- Controller
-- Service
-- Repository
-- DTO
-- Entity
-- Security
-- Exception
-- Common
+* Controller
+* Service
+* Repository
+* DTO
+* Entity
+* Security
+* Exception
+* Common
+
+각 레이어는 명확히 책임을 분리합니다.
+
+| Layer      | 책임            |
+| ---------- | ------------- |
+| Controller | HTTP 요청/응답 처리 |
+| Service    | 비즈니스 로직       |
+| Repository | DB 접근         |
+| Security   | 인증/인가         |
+| Exception  | 전역 예외 처리      |
+| Common     | 공통 응답 구조      |
 
 ---
 
@@ -2099,73 +2172,70 @@ Authorization: Bearer {accessToken}
 
 ## JWT 기반 인증
 
-- 로그인 성공 시 Access Token 발급
-- Authorization Header 사용
+* 로그인 성공 시 Access Token 발급
+* Stateless 구조
+* JwtAuthenticationFilter 적용
+* PrincipalUser / PrincipalUserService 기반 인증 처리
+
+### Authorization Header
 
 ```
 Authorization: Bearer {accessToken}
 ```
 
-### JWT Payload
-
-- adminId
-- email
-- role
-- issuedAt
-- expiredAt
-
-### 특징
-
-- Stateless 구조
-- JwtAuthenticationFilter 적용
-- PrincipalUser / PrincipalUserService 기반 인증 처리
-
 ---
 
-## RBAC (Role-Based Access Control)
+# 🧩 RBAC (Role-Based Access Control)
 
 Spring Security 기반 URL 접근 제어
 
 ### 관리자 역할
 
-- SUPER_ADMIN
-- OPERATION_ADMIN
-- CS_ADMIN
+* SUPER_ADMIN
+* OPERATION_ADMIN
+* CS_ADMIN
 
-권한 부족 시 403 반환
+---
+
+# 🧮 RBAC 권한 매트릭스
+
+| 도메인       | 기능            | SUPER_ADMIN | OPERATION_ADMIN | CS_ADMIN |
+| --------- | ------------- | ----------- | --------------- | -------- |
+| Admin     | 승인/거부/삭제/권한변경 | ✅           | ❌               | ❌        |
+| Customer  | 조회/수정         | ✅           | ✅               | ✅        |
+| Customer  | 삭제            | ✅           | ❌               | ❌        |
+| Product   | 생성/수정/상태변경    | ✅           | ✅               | ❌        |
+| Product   | 삭제            | ✅           | ✅               | ❌        |
+| Category  | 생성            | ✅           | ✅               | ❌        |
+| Category  | 삭제            | ✅           | ✅               | ❌        |
+| Order     | 생성            | ✅           | ❌               | ✅        |
+| Order     | 상태 변경         | ✅           | ✅               | ❌        |
+| Order     | 취소            | ✅           | ❌               | ✅        |
+| Review    | 수정/삭제/복구      | ✅           | ✅               | ❌        |
+| Dashboard | 조회            | ✅           | ✅               | ✅        |
+
+> 실제 코드 기준으로 문서화되었습니다.
 
 ---
 
 # 📦 도메인 설계
 
----
-
 ## 👤 Admin
 
 ### 주요 필드
 
-- id
-- name
-- email (unique)
-- password (BCrypt)
-- role (AdminRoleEnum)
-- status (AdminStatusEnum)
-- approvedAt
-- rejectedAt
-- rejectReason
-- deleted (Soft Delete)
-- createdAt
-- modifiedAt
-
-### 기능
-
-- 관리자 회원가입
-- 로그인
-- 승인 / 거부
-- 역할 변경
-- 상태 변경
-- 비밀번호 변경
-- 프로필 수정
+* id
+* name
+* email (unique)
+* password (BCrypt)
+* role (AdminRoleEnum)
+* status (AdminStatusEnum)
+* approvedAt
+* rejectedAt
+* rejectReason
+* deleted (Soft Delete)
+* createdAt
+* modifiedAt
 
 ---
 
@@ -2173,149 +2243,61 @@ Spring Security 기반 URL 접근 제어
 
 ### 주요 필드
 
-- id
-- name
-- email
-- phoneNumber
-- status
-- deleted
-- createdAt
+* id
+* name
+* email
+* phoneNumber
+* status (ACTIVE / INACTIVE / SUSPENDED)
+* deleted
+* createdAt
 
-### 기능
-
-- 고객 조회
-- 검색 / 정렬 / 페이징
-- 상태 변경
-- Soft Delete
+> README Enum 값은 실제 코드 기준으로 수정되었습니다.
 
 ---
 
 ## 📦 Product
 
-### 구조
+### ProductStatus
 
-- Product
-- Category
-- Sku
-- Inventory
+* AVAILABLE
+* SOLD_OUT
+* DISCONTINUED
 
-### Product
-
-- id
-- name
-- category
-- status (ProductStatus)
-- deleted
-
-### Sku
-
-- id
-- qty
-- status
-
-### Inventory
-
-- 재고 관리 로직 분리
-
-### 특징
-
-- 재고 수량 변경 시 상태 자동 반영
-- 단종 상태 예외 처리
-- QueryDSL 기반 검색
+> 기존 README의 ON_SALE / OUT_OF_STOCK → 코드 기준으로 수정
 
 ---
 
 ## 🛒 Order
 
-### 구조
-
-- Order (1)
-- OrderItem (N)
-
-### Order
-
-- id
-- orderNumber
-- customer
-- status (OrderStatus)
-- totalPrice
-- cancelReason
-- version (낙관적 락)
-- deleted
-- orderedAt
-
-### OrderItem
-
-- id
-- order
-- product
-- quantity
-- price
-
-### 주요 로직
-
-- 주문 생성 시:
-  - 재고 검증
-  - 재고 차감
-  - 총 금액 계산
-- 주문 취소 시:
-  - 상태 검증 (준비중만 가능)
-  - 재고 복구
-  - 상품 상태 재계산
-- @Version 기반 낙관적 락 적용
-
----
-
-## ⭐ Review
-
 ### 주요 필드
 
-- id
-- product
-- customer
-- rating
-- content
-- deleted
-
-### 기능
-
-- 리뷰 조회
-- 상품별 평균 평점 계산
-- 별점 분포 집계
-- 관리자 삭제
+* id
+* orderNumber
+* customer
+* status (OrderStatus)
+* totalPrice
+* cancelReason
+* version (@Version)
+* deleted
+* orderedAt
 
 ---
 
-# 📊 Dashboard
+# 🔒 동시성 제어 전략 (Optimistic Lock)
 
-DashboardJdbcRepository 기반 통계 처리
+주문 상태 변경/취소 시, 여러 관리자가 동시에 동일 주문을 수정할 수 있습니다.
 
-### 제공 데이터
+이를 방지하기 위해:
 
-- 전체 관리자 수
-- 전체 고객 수
-- 전체 상품 수
-- 재고 부족 상품 수
-- 전체 주문 수
-- 오늘 주문 수
-- 총 매출
-- 오늘 매출
-- 리뷰 평균 평점
-- 리뷰 평점 분포
-- 고객 상태 분포
-- 카테고리별 상품 수
-- 최근 주문 10건
+* `@Version` 기반 낙관적 락 적용
+* 충돌 발생 시 OptimisticLockException 발생
+* 서비스 레벨에서 예외 처리 후 사용자에게 메시지 반환
 
-JPA가 아닌 JDBC 사용 → 집계 성능 고려 설계
+### 효과
 
----
-
-# 🔎 검색 / 페이징 / 정렬
-
-- PageableConfig 적용
-- PageResponse 공통 구조 사용
-- QueryDSL 기반 동적 검색
-- RepositoryCustom + Impl 구조 사용
+* Lost Update 방지
+* 동시성 정합성 확보
+* DB 락 최소화
 
 ---
 
@@ -2323,70 +2305,103 @@ JPA가 아닌 JDBC 사용 → 집계 성능 고려 설계
 
 SoftDeletableEntity 상속 구조
 
-- deleted = true
-- 물리 삭제 없음
-- 모든 조회는 deleted = false 조건 포함
+* deleted = true
+* 물리 삭제 없음
+* 모든 조회 시 deleted = false 조건 포함
+
+### 장점
+
+* 데이터 복구 가능
+* 감사 로그 유지
+* 운영 안정성 확보
 
 ---
 
-# ⚠️ 전역 예외 처리
+# ⚠ 전역 예외 처리
 
-- GlobalExceptionHandler
-- ErrorCode Enum
-- ApiResponse / ErrorResponse 통일
+* GlobalExceptionHandler
+* ErrorCode Enum
+* ApiResponse 통일 구조 사용
 
 ---
 
-# 📦 공통 응답 구조
+# 📦 공통 응답 구조 (통일)
 
 ## 성공 응답
 
 ```json
 {
-  "status": 200,
-  "message": "성공 메시지",
-  "data": {}
+  "success": true,
+  "data": {},
+  "error": null
 }
 ```
 
-## 페이지 응답
+## 실패 응답
 
 ```json
 {
-  "content": [],
-  "page": 0,
-  "size": 10,
-  "totalElements": 100,
-  "totalPages": 10
+  "success": false,
+  "data": null,
+  "error": {
+    "timestamp": "2026-02-19T10:00:00",
+    "status": 400,
+    "error": "Bad Request",
+    "code": "VALIDATION_ERROR",
+    "message": "요청값이 올바르지 않습니다.",
+    "path": "/api/order/v1/orders"
+  }
 }
 ```
 
+> README 내부 응답 포맷을 코드 기준(success/data/error)으로 통일
+
 ---
 
-# 📚 기술 스택
+# 🔎 검색 / 페이징 / 정렬
 
-- Java 17
-- Spring Boot
-- Spring Security
-- JWT
-- Spring Data JPA
-- QueryDSL
-- MySQL
-- Lombok
-- Swagger
+* PageableConfig 적용
+* PageResponse 공통 구조 사용
+* QueryDSL 기반 동적 검색
+* RepositoryCustom + Impl 구조
+
+---
+
+# 📊 Dashboard
+
+DashboardJdbcRepository 기반 집계 처리
+
+### 설계 이유
+
+* 대량 집계 시 JPA보다 JDBC가 효율적
+* 복잡한 GROUP BY / SUM / COUNT 최적화
+* 읽기 전용 통계 전용 Repository 분리
+
+---
+
+# 🧪 테스트
+
+현재 기본 Context Load 테스트 구성
+
+향후 확장 가능:
+
+* Service Layer 단위 테스트
+* Repository QueryDSL 테스트
+* Security 인가 테스트
+* 통합 테스트 (MockMvc)
 
 ---
 
 # 🧠 학습 포인트
 
-- JWT 인증 흐름 이해
-- RBAC 설계
-- QueryDSL 동적 쿼리
-- Soft Delete 전략
-- 낙관적 락 기반 동시성 제어
-- Order + OrderItem 구조 설계
-- 집계 쿼리 성능 고려 (JDBC 활용)
-- 공통 응답 구조 통일
+* JWT 인증 흐름
+* RBAC 정책 설계
+* QueryDSL 동적 쿼리
+* Soft Delete 전략
+* 낙관적 락 기반 동시성 제어
+* Order + OrderItem 구조
+* 집계 쿼리 성능 고려 (JDBC)
+* 공통 응답 구조 설계
 
 ---
 
@@ -2394,11 +2409,11 @@ SoftDeletableEntity 상속 구조
 
 본 프로젝트는 단순 CRUD 구현이 아닌,
 
-- 실무형 도메인 설계
-- 인증/인가 구조 설계
-- 상태 전이 설계
-- 동시성 제어 전략
-- 통계 집계 설계
-- 확장 가능한 구조 설계
+* 실무형 도메인 설계
+* 인증/인가 구조 설계
+* 상태 전이 설계
+* 동시성 제어 전략
+* 통계 집계 설계
+* 확장 가능한 구조 설계
 
 를 목표로 한 실전형 백오피스 시스템입니다.
