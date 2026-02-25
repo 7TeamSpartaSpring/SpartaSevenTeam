@@ -43,7 +43,7 @@
 
 ## 2️⃣ 환경 변수 설정
 
-`application.yml` 또는 환경 변수에 아래 값이 필요합니다.
+`application.yaml` 또는 환경 변수에 아래 값이 필요합니다.
 
 ```yaml
 DB_HOST=
@@ -218,6 +218,7 @@ http://localhost:8080
 ## AdminStatus
 - PENDING
 - ACTIVE
+- INACTIVE
 - REJECTED
 - SUSPENDED
 
@@ -453,7 +454,7 @@ Authorization: Bearer {accessToken}
 ```
 {
   "success": true,
-  "data": "logout",
+  "data": "로그아웃 완료",
   "error": null
 }
 ```
@@ -682,7 +683,7 @@ Authorization: Bearer {accessToken}
 | sort | string | 선택 |   |
 | keyword | string | 선택 | 검색어 |
 | role | string | 선택 | `SUPER_ADMIN`/`OPERATION_ADMIN`/`CS_ADMIN` 등 |
-| status | string | 선택 | `ACTIVE`/`PENDING`/`REJECTED`/`SUSPENDED` 등 |
+| status | string | 선택 | `ACTIVE`/`INACTIVE`/`PENDING`/`REJECTED`/`SUSPENDED` 등 |
 
 ### Response Field
 
@@ -2247,7 +2248,7 @@ Spring Security 기반 URL 접근 제어
 * id
 * name
 * email
-* phoneNumber
+* phone
 * status (ACTIVE / INACTIVE / SUSPENDED)
 * deleted
 * createdAt
