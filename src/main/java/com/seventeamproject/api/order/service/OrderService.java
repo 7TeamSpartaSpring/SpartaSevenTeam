@@ -104,7 +104,7 @@ public class OrderService {
     }
 
     //전체조회
-    public PageResponse<OrderListResponse> getAll(Pageable pageable, String keyword, OrderStatus status) {
+    public PageResponse<OrderListResponse> search(Pageable pageable, String keyword, OrderStatus status) {
         return new PageResponse<>(
                 orderRepository.search(pageable, keyword, status)
                         .map(order -> OrderListResponse.from(order, resolveManagerName(order)))
@@ -160,6 +160,7 @@ public class OrderService {
         return new OrderResponse(order);
     }
 
+    // 조회시 등록매니저이름 가져오기
     private String resolveManagerName(Order order) {
         if (order.getRegistrationManagerId() == null) {
             return null;
