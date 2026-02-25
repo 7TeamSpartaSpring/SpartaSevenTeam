@@ -1,3 +1,10 @@
+![java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![mySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
+![JSON WEB TOKEN](https://img.shields.io/badge/json%20web%20tokens-323330?style=for-the-badge&logo=json-web-tokens&logoColor=pink)
+<img width="73" height="70" alt="image" src="https://github.com/user-attachments/assets/e296f0a2-3caa-4fbe-aa19-5e5e40bbddec" />
+
+
 # 🏢 Sparta Seven Team - E-Commerce BackOffice System
 
 > Spring Boot 기반 관리자 전용 이커머스 백오피스 시스템  
