@@ -28,6 +28,11 @@
 
 # 📌 API 목록 테이블 (도메인별 전체 정리)
 
+<details>
+<summary>👉 클릭해서 펼치기</summary>
+
+<br>
+
 ---
 
 # 🔐 AUTH 도메인
@@ -169,8 +174,12 @@
 - COMPLETED
 - CANCELED
 
+</details>
+
+# 📌 API 명세서
+
 <details>
-<summary>📌 API 명세서 전체 보기 (클릭)</summary>
+<summary>👉 클릭해서 펼치기</summary>
 
 <br>
 
