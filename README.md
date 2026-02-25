@@ -23,6 +23,9 @@
 
 본 프로젝트는 단순 CRUD가 아닌 **실무 구조를 반영한 설계 기반 프로젝트**입니다.
 
+![diagram](https://github.com/user-attachments/assets/c1a2a591-7611-461a-a3d2-f72aff505ac1)
+
+
 # 📌 API 목록 테이블 (도메인별 전체 정리)
 
 ---
@@ -165,6 +168,14 @@
 - SHIPPING
 - COMPLETED
 - CANCELED
+
+<details>
+<summary>📌 API 명세서 전체 보기 (클릭)</summary>
+
+<br>
+
+
+
 ````
 # 📌 API 명세서 (SevenTeam Backoffice) — 최신화
 
@@ -2055,6 +2066,10 @@ Authorization: Bearer {accessToken}
 
 
 ---
+
+
+</details>
+
 
 # 🏗️ 시스템 아키텍처
 
