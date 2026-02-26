@@ -43,11 +43,13 @@
 
 ## 2️⃣ 환경 변수 설정
 
+
 `.gitignore`에 `*.yaml`이 포함되어 있어 `src/main/resources/application.yaml`은 저장소에 포함되지 않을 수 있습니다.
 클론 후 아래 둘 중 하나로 먼저 설정해주세요.
 
 1. `src/main/resources/application.yaml` 파일을 직접 생성하고 아래 값들을 채우기
 2. OS 환경 변수로 아래 값들을 설정한 뒤 실행하기
+
 
 ```yaml
 DB_HOST=
@@ -60,6 +62,7 @@ JWT_KEY=
 
 > JWT_KEY는 충분히 긴 랜덤 문자열 사용 권장
 > 액세스 토큰 만료시간은 현재 코드에서 `jwt.access-token-validity=691200000`으로 고정되어 있습니다.
+
 
 예시 `application.yaml`:
 
@@ -100,6 +103,7 @@ jwt:
   secret: ${JWT_KEY}
   access-token-validity: 691200000
 ```
+
 
 ---
 
