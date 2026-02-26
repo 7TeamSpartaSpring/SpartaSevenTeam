@@ -72,6 +72,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/v1/products/{productId}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN', 'CS_ADMIN')")
     public ResponseEntity<Void> delete(Authentication authentication,
                                        @PathVariable Long productId) {
         productService.delete(productId, ((PrincipalUser) authentication.getPrincipal()).getId());

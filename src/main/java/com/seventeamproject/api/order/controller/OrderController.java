@@ -23,7 +23,7 @@ public class OrderController {
     private final OrderService orderService;
 
     //생성
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN', 'CS_ADMIN')")
     @PostMapping("/v1/orders")
     public ResponseEntity<ApiResponse<OrderResponse>> save(
             Authentication authentication,
@@ -33,7 +33,7 @@ public class OrderController {
     }
 
     //전체조회
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN', 'CS_ADMIN')")
     @GetMapping("/v1/orders")
     public ResponseEntity<ApiResponse<PageResponse<OrderListResponse>>> search(
             @ModelAttribute OrderSearchRequest request
@@ -46,7 +46,7 @@ public class OrderController {
 
 
     // 단건조회
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN', 'CS_ADMIN')")
     @GetMapping("/v1/orders/{orderId}")
     public ResponseEntity<ApiResponse<GetOneOrderResponse>> getOne(
             @PathVariable Long orderId) {
@@ -55,7 +55,7 @@ public class OrderController {
     }
 
     // 상태변경
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN')")
     @PatchMapping("/v1/orders/{orderId}/status")
     public ResponseEntity<ApiResponse<OrderResponse>> update(
             @PathVariable Long orderId,
@@ -65,7 +65,7 @@ public class OrderController {
     }
 
     // 주문취소
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN', 'CS_ADMIN')")
     @PatchMapping("/v1/orders/{orderId}/cancel")
     public ResponseEntity<ApiResponse<OrderResponse>> cancel(
             @PathVariable Long orderId,
@@ -75,7 +75,7 @@ public class OrderController {
     }
 
     //과제용전체조회
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN', 'CS_ADMIN')")
     @GetMapping("/v1/orders/single")
     public ResponseEntity<ApiResponse<PageResponse<OrderNotListResponse>>> searchV2(
             @ModelAttribute OrderSearchRequest request
@@ -86,7 +86,7 @@ public class OrderController {
     }
 
     //과제용 1주문1물건생성
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION', 'CS_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','OPERATION_ADMIN', 'CS_ADMIN')")
     @PostMapping("/v1/orders/single")
     public ResponseEntity<ApiResponse<OrderResponse>> saveOne(
             Authentication authentication,
